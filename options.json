@@ -1,0 +1,84 @@
+{
+    "format": 1,
+    "generator": {
+        "info": "BMG.js is a (mostly) faithful clone of the original program.",
+        "madeBy": "Elatrock",
+        "gitHub": "https://github.com/Elatrock/BMG.js",
+        "version": "1.0",
+        "console": {
+
+        },
+        "settings": {
+            "ignoreOrder": false,
+            "ignoreOrderHor": false,
+            "ignoreLinkTiles": false,
+            "ignoreSkipTiles": false,
+            "ignoreReplaceTiles": false,
+            "ignoreSpecialTileRules": false,
+            "ignoreAssetSwitchers": false,
+            "ignoreOverrideEnvironment": false
+        }
+    },
+    "preset": "brawlstars",
+    "batch": [
+        {
+            "name": "Map Name",
+            "grid": [
+
+            ],
+            "environment": "Environment Name",
+            "skipTiles": [ "" ],
+            "replaceTiles": [
+                {
+                    "from": "",
+                    "to": ""
+                }
+            ],
+            "specialTileRules": [
+                {
+                    "code": "",
+                    "occurrence": 0,
+                    "type": ""
+                }
+            ],
+            "overrideEnvironment": [
+                {
+                    "tile": "",
+                    "type": ""
+                }
+            ],
+            "assetSwitchers": [
+                {
+                    "find": {
+                        "tile": "",
+                        "type": ""
+                    },
+                    "replace": {
+                        "tile": "",
+                        "type": ""
+                    }
+                }
+            ],
+            "emptyBorderAmount": [ 1 ],
+            "gamemode": "Gamemode Name"
+        }
+    ],
+    "exportFileName": "batch_?number?.png",
+    "exportFolderName": "output",
+    "exportQuality": 100,
+    "assetSwitchers": [
+        {
+            "find": {
+                "tile": "",
+                "type": ""
+            },
+            "replace": {
+                "tile": "",
+                "type": ""
+            }
+        }
+    ],
+    "randomizers": {
+        "enabled": true
+    }
+}

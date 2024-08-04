@@ -1,0 +1,1910 @@
+{
+    "ignoreTiles": [
+        ".",
+		"D",
+		"0",
+		"7",
+		"6",
+		"Q",
+		"r"
+    ],
+    "tiles": [
+        {
+            "display": "Primary Wall",
+            "name": "blocking1",
+            "code": "M",
+            "type": "ENV",
+            "variants": {
+                "woodBlock": {
+                    "asset": "wood_block.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Secondary Wall",
+            "name": "blocking2",
+            "code": "X",
+            "type": "ENV",
+            "variants": {
+                "woodBlock": {
+                    "asset": "wood_block.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Crate",
+            "name": "blocking3",
+            "code": "Y",
+            "type": "ENV",
+            "variants": {
+                "crate": {
+                    "asset": "crate.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Barrel",
+            "name": "blocking4",
+            "code": "C",
+            "type": "ENV",
+            "variants": {
+                "barrel": {
+                    "asset": "barrel.svg",
+                    "offset": {
+                        "top": 439,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Grass",
+            "name": "forest",
+            "code": "F",
+            "type": "ENV",
+            "variants": {
+                "grassYellow": {
+                    "asset": "grass_yellow.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Special Wall",
+            "name": "respawningWall",
+            "code": "T",
+            "type": "ENV",
+            "variants": {
+                "cactus": {
+                    "asset": "cactus.svg",
+                    "offset": {
+                        "top": 527,
+                        "left": 28
+                    },
+                    "order": 0,
+                    "orderHor": 1
+                }
+            }
+        },
+        {
+            "display": "Destructible",
+            "name": "blockingDestroyableWithWeapon",
+            "code": "B",
+            "type": "ENV",
+            "variants": {
+                "skull": {
+                    "asset": "skull.svg",
+                    "offset": {
+                        "top": 980,
+                        "left": 8
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Fence",
+            "name": "fence",
+            "code": "N",
+            "type": "ENV",
+            "variants": {
+                "woodenFences": {
+                    "linkTiles": {
+                        "hor": {
+                            "asset": "fence_hor.svg",
+                            "offset": {
+                                "top": 601,
+                                "left": 45
+                            },
+                            "order": 0,
+                            "orderHor": 1
+                        },
+                        "ver": {
+                            "asset": "fence_ver.svg",
+                            "offset": {
+                                "top": 601,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "cor": {
+                            "asset": "fence_cor.svg",
+                            "offset": {
+                                "top": 517,
+                                "left": 45
+                            },
+                            "order": 0,
+                            "orderHor": 1
+                        }
+                    },
+                    "linkRules": "simpleFences"
+                }
+            }
+        },
+        {
+            "display": "Water",
+            "name": "water",
+            "code": "W",
+            "type": "ENV"
+        },
+        {
+            "display": "Player 1",
+            "name": "player1",
+            "code": "1",
+            "type": "MODE",
+            "variants": {
+                "playerBlue": {
+                    "asset": "player_blue.svg",
+                    "offset": {
+                        "top": 350,
+                        "left": 350
+                    },
+                    "order": 5,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Player 2",
+            "name": "player2",
+            "code": "2",
+            "type": "MODE",
+            "variants": {
+                "playerRed": {
+                    "asset": "player_blue.svg",
+                    "offset": {
+                        "top": 350,
+                        "left": 350
+                    },
+                    "order": 5,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Objective",
+            "name": "objective",
+            "code": "8",
+            "type": "MODE",
+            "variants": {
+                "mine": {
+                    "asset": "mine.svg",
+                    "offset": {
+                        "top": 402,
+                        "left": 440
+                    },
+                    "order": 5,
+                    "orderHor": 0
+                },
+                "payloadCart": {
+                    "linkTiles": {
+                        "c1b": {
+                            "asset": "payload_blue.svg",
+                            "offset": {
+                                "top": 700,
+                                "left": 2200
+                            },
+                            "order": 3,
+                            "orderHor": 0
+                        },
+                        "c1sb": {
+                            "asset": "payload_blue_side.svg",
+                            "offset": {
+                                "top": 2200,
+                                "left": 700
+                            },
+                            "order": 3,
+                            "orderHor": 0
+                        },
+                        "c2b": {
+                            "asset": "payload_blue.svg",
+                            "offset": {
+                                "top": 700,
+                                "left": -1800
+                            },
+                            "order": 3,
+                            "orderHor": 0
+                        },
+                        "c2sb": {
+                            "asset": "payload_blue_side.svg",
+                            "offset": {
+                                "top": -1800,
+                                "left": 700
+                            },
+                            "order": 3,
+                            "orderHor": 0
+                        },
+                        "c1r": {
+                            "asset": "payload_red.svg",
+                            "offset": {
+                                "top": 700,
+                                "left": 2200
+                            },
+                            "order": 3,
+                            "orderHor": 0
+                        },
+                        "c1sr": {
+                            "asset": "payload_red_side.svg",
+                            "offset": {
+                                "top": 2200,
+                                "left": 700
+                            },
+                            "order": 3,
+                            "orderHor": 0
+                        },
+                        "c2r": {
+                            "asset": "payload_red.svg",
+                            "offset": {
+                                "top": 700,
+                                "left": -1800
+                            },
+                            "order": 3,
+                            "orderHor": 0
+                        },
+                        "c2sr": {
+                            "asset": "payload_red_side.svg",
+                            "offset": {
+                                "top": -1800,
+                                "left": 700
+                            },
+                            "order": 3,
+                            "orderHor": 0
+                        }
+                    },
+                    "linkRules": "payloadCart"
+                }
+            }
+        },
+        {
+            "display": "Spring Pad Right",
+            "name": "springpadRight",
+            "code": "H",
+            "type": "UTIL",
+            "variants": {
+                "springPadRight": {
+                    "asset": "spring_right.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Spring Pad Left",
+            "name": "springpadLeft",
+            "code": "G",
+            "type": "UTIL",
+            "variants": {
+                "springPadLeft": {
+                    "asset": "spring_left.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Spring Pad Bottom",
+            "name": "springpadBottom",
+            "code": "L",
+            "type": "UTIL",
+            "variants": {
+                "springPadBottom": {
+                    "asset": "spring_bottom.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Spring Pad Top",
+            "name": "springpadTop",
+            "code": "K",
+            "type": "UTIL",
+            "variants": {
+                "springPadTop": {
+                    "asset": "spring_top.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Spring Pad Bottom Right",
+            "name": "springpadBottomRight",
+            "code": "P",
+            "type": "UTIL",
+            "variants": {
+                "springPadBottomRight": {
+                    "asset": "spring_bottom_right.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Spring Pad Top Left",
+            "name": "springpadTopLeft",
+            "code": "Z",
+            "type": "UTIL",
+            "variants": {
+                "springPadTopLeft": {
+                    "asset": "spring_top_left.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Spring Pad Bottom Left",
+            "name": "springpadBottomLeft",
+            "code": "O",
+            "type": "UTIL",
+            "variants": {
+                "springPadBottomLeft": {
+                    "asset": "spring_bottom_left.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Spring Pad Top Right",
+            "name": "springpadTopRight",
+            "code": "U",
+            "type": "UTIL",
+            "variants": {
+                "springPadTopRight": {
+                    "asset": "spring_top_right.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Ike Range",
+            "name": "ikeRange",
+            "code": ",",
+            "type": "MODE",
+            "variants": {
+                "ikeRangeBlue": {
+                    "asset": "ike_blue_range.svg",
+                    "offset": {
+                        "top": 12487,
+                        "left": 11650
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "ikeRangeRed": {
+                    "asset": "ike_blue_range.svg",
+                    "offset": {
+                        "top": 525,
+                        "left": 11650
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Rails",
+            "name": "rails",
+		    "code": "Q",
+            "type": "MODE",
+            "variants": {
+                "rails": {
+                    "asset": "rails.svg",
+                    "offset": {
+                        "top": 10343,
+                        "left": 10097
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Bench",
+            "name": "bench1",
+            "code": "E",
+            "type": "ENV",
+            "tags": [
+                "benchOne"
+            ],
+            "variants": {
+                "benches": {
+                    "linkTiles": {
+                        "tl": {
+                            "asset": "bench_top_left.svg",
+                            "offset": {
+                                "top": 438,
+                                "left": 46
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "tr": {
+                            "asset": "bench_top_right.svg",
+                            "offset": {
+                                "top": 438,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "lt": {
+                            "asset": "bench_left_top.svg",
+                            "offset": {
+                                "top": 302,
+                                "left": 150
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "lb": {
+                            "asset": "bench_left_bottom.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 150
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        }
+                    },
+                    "linkRules": "benches"
+                },
+                "snowBarrier": {
+                    "asset": "snow_barrier.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Bench",
+            "name": "bench2",
+            "code": "A",
+            "type": "ENV",
+            "variants": {
+                "benches": {
+                    "linkTiles": {
+                        "bl": {
+                            "asset": "bench_bottom_left.svg",
+                            "offset": {
+                                "top": 400,
+                                "left": 46
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "br": {
+                            "asset": "bench_bottom_right.svg",
+                            "offset": {
+                                "top": 400,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "rt": {
+                            "asset": "bench_right_top.svg",
+                            "offset": {
+                                "top": 302,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "rb": {
+                            "asset": "bench_right_bottom.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        }
+                    },
+                    "linkRules": "benches"
+                }
+            }
+        },
+        {
+            "display": "Teleporter Blue",
+            "name": "teleporterBlue",
+            "code": "c",
+            "type": "UTIL",
+            "variants": {
+                "teleporterBlue": {
+                    "asset": "teleporter_blue.svg",
+                    "offset": {
+                        "top": -35,
+                        "left": 41
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Teleporter Green",
+            "name": "teleporterGreen",
+            "code": "d",
+            "type": "UTIL",
+            "variants": {
+                "teleporterGreen": {
+                    "asset": "teleporter_green.svg",
+                    "offset": {
+                        "top": -35,
+                        "left": 41
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Teleporter Red",
+            "name": "teleporterRed",
+            "code": "e",
+            "type": "UTIL",
+            "variants": {
+                "teleporterRed": {
+                    "asset": "teleporter_red.svg",
+                    "offset": {
+                        "top": -35,
+                        "left": 41
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Teleporter Yellow",
+            "name": "teleporterYellow",
+            "code": "f",
+            "type": "UTIL",
+            "variants": {
+                "teleporterYellow": {
+                    "asset": "teleporter_yellow.svg",
+                    "offset": {
+                        "top": -35,
+                        "left": 41
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Rope Fence",
+            "name": "ropeFence",
+            "code": "a",
+            "type": "ENV",
+            "variants": {
+                "ropeFences": {
+                    "linkTiles": {
+                        "a": {
+                            "asset": "rope_post.svg",
+                            "offset": {
+                                "top": 500,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "t": {
+                            "asset": "rope_post_t.svg",
+                            "offset": {
+                                "top": 1325,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "r": {
+                            "asset": "rope_post_r.svg",
+                            "offset": {
+                                "top": 500,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "tr": {
+                            "asset": "rope_post_tr.svg",
+                            "offset": {
+                                "top": 1325,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        }
+                    },
+                    "linkRules": "ropeFences"
+                }
+            }
+        },
+        {
+            "display": "Spikes",
+            "name": "intervalDamage",
+            "code": "v",
+            "type": "UTIL",
+            "variants": {
+                "spikes": {
+                    "asset": "spikes.svg",
+                    "offset": {
+                        "top": 225,
+                        "left": -30
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Poison",
+            "name": "damage",
+            "code": "x",
+            "type": "UTIL",
+            "variants": {
+                "poison": {
+                    "asset": "poison.svg",
+                    "offset": {
+                        "top": 829,
+                        "left": 329
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Heal Pad",
+            "name": "healing",
+            "code": "y",
+            "type": "UTIL",
+            "variants": {
+                "healPad": {
+                    "asset": "healpad.svg",
+                    "offset": {
+                        "top": 100,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Slow Pad",
+            "name": "slow",
+            "code": "z",
+            "type": "UTIL",
+            "variants": {
+                "slowPad": {
+                    "asset": "slowpad.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": -2,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Speed Pad",
+            "name": "fast",
+            "code": "w",
+            "type": "UTIL",
+            "variants": {
+                "speedPad": {
+                    "asset": "speedpad.svg",
+                    "offset": {
+                        "top": 0,
+                        "left": 0
+                    },
+                    "order": -2,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Indestructible",
+            "name": "indestructible",
+            "code": "I",
+            "type": "ENV",
+            "variants": {
+                "indestructible": {
+                    "asset": "indestructible.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "indestructibleBricks": {
+                    "asset": "indestructible_bricks.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Power Crate",
+            "name": "powerupCrate",
+            "code": "4",
+            "type": "MODE",
+            "variants": {
+                "powerCrate": {
+                    "asset": "power_crate.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Dynamite",
+            "name": "explosive",
+            "code": "q",
+            "type": "UTIL",
+            "variants": {
+                "tnt": {
+                    "asset": "tnt.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "Map Item",
+            "name": "gameMapItem",
+            "code": "g",
+            "type": "MODE",
+            "variants": {
+                "bolts": {
+                    "asset": "bolt_0.svg",
+                    "offset": {
+                        "top": 350,
+                        "left": 50
+                    },
+                    "order": 3,
+                    "orderHor": 0,
+                    "randomizer": [
+                        {
+                            "asset": "bolt_0.svg"
+                        },
+                        {
+                            "asset": "bolt_1.svg"
+                        },
+                        {
+                            "asset": "bolt_2.svg"
+                        },
+                        {
+                            "asset": "bolt_3.svg"
+                        }
+                    ]
+                },
+                "botSpawn": {
+                    "asset": "bot_drop.svg",
+                    "offset": {
+                        "top": 425,
+                        "left": 450
+                    },
+                    "order": 4,
+                    "orderHor": 0
+                },
+                "coins": {
+                    "asset": "coin_2.svg",
+                    "offset": {
+                        "top": 550,
+                        "left": 750
+                    },
+                    "order": 3,
+                    "orderHor": 0,
+                    "randomizer": [
+                        {
+                            "asset": "coin_0.svg",
+                            "offset": {
+                                "top": 800,
+                                "left": 750
+                            }
+                        },
+                        {
+                            "asset": "coin_1.svg",
+                            "offset": {
+                                "top": 750,
+                                "left": 750
+                            }
+                        },
+                        {
+                            "asset": "coin_2.svg"
+                        },
+                        {
+                            "asset": "coin_3.svg",
+                            "offset": {
+                                "top": 750,
+                                "left": 750
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "display": "Payload Track",
+            "name": "payloadTrack",
+            "code": "b",
+            "type": "MODE",
+            "variants": {
+                "payloadTrack": {
+                    "linkTiles": {
+                        "n": {
+                            "asset": "nothing.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "tb": {
+                            "asset": "payload_blue_t.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "trb": {
+                            "asset": "payload_blue_tr.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "tlb": {
+                            "asset": "payload_blue_tl.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "bb": {
+                            "asset": "payload_blue_b.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "brb": {
+                            "asset": "payload_blue_br.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "blb": {
+                            "asset": "payload_blue_bl.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "rb": {
+                            "asset": "payload_blue_r.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "lb": {
+                            "asset": "payload_blue_l.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "horb": {
+                            "asset": "payload_blue_hor.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "verb": {
+                            "asset": "payload_blue_ver.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "tr": {
+                            "asset": "payload_red_t.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "trr": {
+                            "asset": "payload_red_tr.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "tlr": {
+                            "asset": "payload_red_tl.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "br": {
+                            "asset": "payload_red_b.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "brr": {
+                            "asset": "payload_red_br.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "blr": {
+                            "asset": "payload_red_bl.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "rr": {
+                            "asset": "payload_red_r.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "lr": {
+                            "asset": "payload_red_l.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "horr": {
+                            "asset": "payload_red_hor.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "verr": {
+                            "asset": "payload_red_ver.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        }
+                    },
+                    "linkRules": "payloadTrack"
+                }
+            }
+        },
+        {
+            "display": "Bumper",
+            "name": "bouncer",
+            "code": "o",
+            "type": "UTIL",
+            "variants": {
+                "bumper": {
+                    "asset": "bumper.svg",
+                    "offset": {
+                        "top": 450,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        },
+        {
+            "display": "8-Bit",
+            "name": "EightBit",
+            "code": "m",
+            "type": "MODE",
+            "variants": {
+                "eightbit": {
+                    "asset": "8bit_icon.svg",
+                    "offset": {
+                        "top": 250,
+                        "left": 225
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                }
+            }
+        }
+    ],
+    "linkRules": {
+        "simpleFences": {
+            "rules": [
+                {
+                    "condition": "*1****0*",
+                    "linkTile": "cor"
+                },
+                {
+                    "condition": "*0****1*",
+                    "linkTile": "cor"
+                },
+                {
+                    "condition": "***01***",
+                    "linkTile": "cor"
+                },
+                {
+                    "condition": "***10***",
+                    "linkTile": "cor"
+                },
+                {
+                    "condition": "*1****1*",
+                    "linkTile": "ver"
+                }
+            ],
+            "defaults": {
+                "linkTile": "hor"
+            },
+            "multipleConditions": false,
+            "edgeCase": 1
+        },
+        "benches": {
+            "rules": [
+                {
+                    "condition": "***01***",
+                    "requiredTags": "benchOne",
+                    "linkTile": "tr"
+                },
+                {
+                    "condition": "***10***",
+                    "requiredTags": "benchOne",
+                    "linkTile": "tl"
+                },
+                {
+                    "condition": "*0****1*",
+                    "requiredTags": "benchOne",
+                    "linkTile": "lt"
+                },
+                {
+                    "condition": "*1****0*",
+                    "requiredTags": "benchOne",
+                    "linkTile": "lb"
+                },
+                {
+                    "condition": "***01***",
+                    "linkTile": "tr"
+                },
+                {
+                    "condition": "***10***",
+                    "linkTile": "tl"
+                },
+                {
+                    "condition": "*0****1*",
+                    "linkTile": "lt"
+                },
+                {
+                    "condition": "*1****0*",
+                    "linkTile": "lb"
+                }
+            ],
+            "defaults": {
+                "linkTile": "tr"
+            },
+            "multipleConditions": false,
+            "edgeCase": 0
+        },
+        "ropeFences": {
+            "rules": [
+                {
+                    "condition": "*1**1***",
+                    "linkTile": "tr"
+                },
+                {
+                    "condition": "*0**1***",
+                    "linkTile": "r"
+                },
+                {
+                    "condition": "*1**0***",
+                    "linkTile": "t"
+                }
+            ],
+            "defaults": {
+                "linkTile": "a"
+            },
+            "multipleConditions": false,
+            "edgeCase": 0
+        },
+        "payloadCart": {
+            "rules": [
+                {
+					"condition": "******1*",
+					"overrideCode": "b",
+					"requiredGamemode": "Payload",
+					"requiredTag": "redTrack",
+					"linkTile": "c2side"
+				},
+				{
+					"condition": "*1******",
+					"overrideCode": "b",
+					"requiredGamemode": "Payload",
+					"requiredTag": "redTrack",
+					"linkTile": "c1side"
+				},
+				{
+					"condition": "****1***",
+					"overrideCode": "b",
+					"requiredGamemode": "Payload",
+					"requiredTag": "redTrack",
+					"linkTile": "c2"
+				},
+				{
+					"condition": "***1****",
+					"overrideCode": "b",
+					"requiredGamemode": "Payload",
+					"requiredTag": "redTrack",
+					"linkTile": "c1"
+				},
+				{
+					"condition": "******1*",
+					"overrideCode": "b",
+					"requiredGamemode": "Payload",
+					"linkTile": "c2side"
+				},
+				{
+					"condition": "*1******",
+					"overrideCode": "b",
+					"requiredGamemode": "Payload",
+					"linkTile": "c1side"
+				},
+				{
+					"condition": "****1***",
+					"overrideCode": "b",
+					"requiredGamemode": "Payload",
+					"linkTile": "c2"
+				},
+				{
+					"condition": "***1****",
+					"overrideCode": "b",
+					"requiredGamemode": "Payload",
+					"linkTile": "c1"
+				}
+            ],
+            "defaults": {
+                "linkTile": "c1"
+            },
+            "multipleConditions": false,
+            "edgeCase": 0
+        },
+        "payloadTrack": {
+            "rules": [
+                {
+					"condition": "*1**1***",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "brr"
+				},
+				{
+					"condition": "*1*1****",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "blr"
+				},
+				{
+					"condition": "****1*1*",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "trr"
+				},
+				{
+					"condition": "***1**1*",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "tlr"
+				},
+				{
+					"condition": "*1****1*",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "verr"
+				},
+				{
+					"condition": "***11***",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "horr"
+				},
+				{
+					"condition": "****1***",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "rr"
+				},
+				{
+					"condition": "***1****",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "lr"
+				},
+				{
+					"condition": "*1******",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "br"
+				},
+				{
+					"condition": "******1*",
+					"requiredTag": "redTrack",
+					"requiredGamemode": "Payload",
+					"linkTile": "tr"
+				},
+				{
+					"condition": "*1**1***",
+					"requiredGamemode": "Payload",
+					"linkTile": "brb"
+				},
+				{
+					"condition": "*1*1****",
+					"requiredGamemode": "Payload",
+					"linkTile": "blb"
+				},
+				{
+					"condition": "****1*1*",
+					"requiredGamemode": "Payload",
+					"linkTile": "trb"
+				},
+				{
+					"condition": "***1**1*",
+					"requiredGamemode": "Payload",
+					"linkTile": "tlb"
+				},
+				{
+					"condition": "*1****1*",
+					"requiredGamemode": "Payload",
+					"linkTile": "verb"
+				},
+				{
+					"condition": "***11***",
+					"requiredGamemode": "Payload",
+					"linkTile": "horb"
+				},
+				{
+					"condition": "****1***",
+					"requiredGamemode": "Payload",
+					"linkTile": "rb"
+				},
+				{
+					"condition": "***1****",
+					"requiredGamemode": "Payload",
+					"linkTile": "lb"
+				},
+				{
+					"condition": "*1******",
+					"requiredGamemode": "Payload",
+					"linkTile": "bb"
+				},
+				{
+					"condition": "******1*",
+					"requiredGamemode": "Payload",
+					"linkTile": "tb"
+				}
+            ],
+            "defaults": {
+                "linkTile": "n"
+            },
+            "multipleConditions": false,
+            "edgeCase": 0
+        }
+    },
+    "gamemodes": [
+        {
+            "name": "Gem Grab",
+            "drawEdit": [
+                {
+                    "tile": "objective",
+                    "position": "m,m"
+                }
+            ],
+            "defaults": {
+                "tiles": {
+                    "objective": "mine"
+                }
+            }
+        },
+        {
+            "name": "Brawl Ball",
+            "drawEdit": [
+                {
+                    "tile": "objective",
+                    "position": "m,m"
+                }
+            ],
+            "defaults": {
+                "tiles": {
+                    "objective": "brawlBall"
+                },
+                "positionTiles": {
+                    "team1": {
+                        "drawOver": [
+                            {
+                                "tile": "objective",
+                                "type": "goalBlue",
+                                "position": "m,-2",
+                                "drawOrder": 2
+                            }
+                        ]
+                    },
+                    "team2": {
+                        "drawOver": [
+                            {
+                                "tile": "objective",
+                                "type": "goalRed",
+                                "position": "m,2",
+                                "drawOrder": 2
+                            }
+                        ]
+                    }
+                },
+                "positionDivide": "hor",
+                "invert": false
+            }
+        },
+        {
+            "name": "Showdown",
+            "defaults": {
+                "tiles": {
+                    "player1": "playerGray",
+                    "player2": "playerGreen"
+                }
+            }
+        },
+        {
+            "name": "Bounty",
+            "drawEdit": [
+                {
+                    "tile": "objective",
+                    "position": "m,m"
+                }
+            ],
+            "defaults": {
+                "tiles": {
+                    "objective": "starBlue"
+                }
+            }
+        },
+        {
+            "name": "Heist",
+            "defaults": {
+                "tiles": {
+                    "objective": "safe"
+                }
+            }
+        },
+        {
+            "name": "Siege",
+            "defaults": {
+                "tiles": {
+                    "objective": "ikeBlue",
+                    "gameMapItem": "bolts"
+                },
+                "positionTiles": {
+                    "team1": {
+                        "drawOver": [
+                            {
+                                "tile": "objective",
+                                "type": "ikeRangeBlue",
+                                "position": "m,-1",
+                                "drawOrder": 1
+                            }
+                        ],
+                        "tiles": {
+                            "objective": "ikeBlue"
+                        }
+                    },
+                    "team2": {
+                        "drawOver": [
+                            {
+                                "tile": "objective",
+                                "type": "ikeRangeRed",
+                                "position": "m,1",
+                                "drawOrder": 1
+                            }
+                        ],
+                        "tiles": {
+                            "objective": "ikeRed"
+                        }
+                    }
+                },
+                "positionDivide": "hor",
+                "invert": false
+            }
+        },
+        {
+            "name": "Present Plunder",
+            "defaults": {
+                "tiles": {
+                    "objective": "presentBlue"
+                },
+                "positionTiles": {
+                    "team1": {
+                        "tiles": {
+                            "objective": "presentBlue"
+                        }
+                    },
+                    "team2": {
+                        "tiles": {
+                            "objective": "presentRed"
+                        }
+                    }
+                },
+                "positionDivide": "hor",
+                "invert": false
+            }
+        },
+        {
+            "name": "Hot Zone",
+            "defaults": {
+                "tiles": {
+                    "objective": "hotZone"
+                }
+            }
+        },
+        {
+            "name": "Big Game",
+            "defaults": {
+                "tiles": {
+                    "player1": "playerGray",
+                    "player2": "playerBig"
+                }
+            }
+        },
+        {
+            "name": "Robo Rumble",
+            "defaults": {
+                "tiles": {
+                    "player2": "playerNothing",
+                    "objective": "safe"
+                }
+            }
+        },
+        {
+            "name": "Boss Fight",
+            "defaults": {
+                "tiles": {
+                    "player2": "playerBoss"
+                }
+            }
+        },
+        {
+            "name": "Lone Star",
+            "drawOver": [
+                {
+                    "tile": "objective",
+                    "type": "star",
+                    "position": "m,m",
+                    "drawOrder": 2
+                }
+            ],
+            "defaults": {
+                "tiles": {
+                    "objective": "star"
+                }
+            }
+        },
+        {
+            "name": "Takedown",
+            "drawOver": [
+                {
+                    "tile": "player2",
+                    "type": "playerBoss",
+                    "position": "m,m",
+                    "drawOrder": 2
+                }
+            ],
+            "defaults": {
+                "tiles": {
+                    "player1": "playerGray",
+                    "player2": "playerNothing"
+                }
+            }
+        },
+        {
+            "name": "Super City Rampage",
+            "defaults": {
+                "tiles": {
+                    "player2": "playerKaiju"
+                }
+            }
+        },
+        {
+            "name": "Hold The Trophy",
+            "drawOver": [
+                {
+                    "tile": "objective",
+                    "type": "trophy",
+                    "position": "m,m",
+                    "drawOrder": 2
+                }
+            ],
+            "defaults": {
+                "tiles": {
+                    "objective": "trophy"
+                }
+            }
+        },
+        {
+            "name": "Volley Brawl",
+            "drawOver": [
+                {
+                    "tile": "objective",
+                    "type": "volleyBall",
+                    "position": "m,m",
+                    "drawOrder": 2
+                }
+            ],
+            "defaults": {
+                "tiles": {
+                    "objective": "volleyBall"
+                }
+            }
+        },
+        {
+            "name": "Basket Brawl",
+            "drawOver": [
+                {
+                    "tile": "objective",
+                    "type": "basketBall",
+                    "position": "m,m",
+                    "drawOrder": 2
+                }
+            ],
+            "defaults": {
+                "tiles": {
+                    "objective": "basketBall"
+                },
+                "positionTiles": {
+                    "team1": {
+                        "drawOver": [
+                            {
+                                "tile": "objective",
+                                "type": "basketRangeBlue",
+                                "position": "r,m",
+                                "drawOrder": 1
+                            },
+                            {
+                                "tile": "objective",
+                                "type": "basketBlue",
+                                "position": "r,m",
+                                "drawOrder": 2
+                            }
+                        ]
+                    },
+                    "team2": {
+                        "drawOver": [
+                            {
+                                "tile": "objective",
+                                "type": "basketRangeRed",
+                                "position": "l,m",
+                                "drawOrder": 1
+                            },
+                            {
+                                "tile": "objective",
+                                "type": "basketRed",
+                                "position": "l,m",
+                                "drawOrder": 2
+                            }
+                        ]
+                    }
+                },
+                "positionDivide": "ver",
+                "invert": false
+            }
+        },
+        {
+            "name": "Payload",
+            "defaults": {
+                "tiles": {
+                    "objective": "payloadCart"
+                }
+            }
+        },
+        {
+            "name": "Bot Drop",
+            "defaults": {
+                "tiles": {
+                    "gameMapItem": "botSpawn"
+                }
+            }
+        },
+        {
+            "name": "Last Stand",
+            "defaults": {
+                "tiles": {
+                    "gameMapItem": "coins"
+                }
+            }
+        },
+        {
+            "name": "Trophy Escape",
+            "defaults": {
+                "tiles": {
+                    "player1": "playerGray",
+                    "player2": "playerNothing",
+                    "objective": "teleporterBig",
+                    "gameMapItem": "botSpawn"
+                }
+            }
+        }
+    ],
+    "defaultEnvironment": {
+        "name": "Fallback",
+        "background": {
+            "color1": {
+                "r": 0,
+                "g": 0,
+                "b": 0
+            },
+            "color2": {
+                "r": 255,
+                "g": 0,
+                "b": 220
+            }
+        },
+        "defaults": {
+            "tiles": {
+                "blocking1": "woodBlock",
+                "blocking2": "woodBlock",
+                "blocking3": "crate",
+                "blocking4": "barrel",
+                "respawningWall": "cactus",
+                "blockingDestroyableWithWeapon": "skull",
+                "fence": "woodenFences",
+                "water": "water",
+                "player1": "playerBlue",
+                "player2": "playerRed",
+                "objective": "mine",
+                "springpadRight": "springPadRight",
+                "springpadLeft": "springPadLeft",
+                "springpadBottom": "springPadBottom",
+                "springpadTop": "springPadTop",
+                "springpadBottomRight": "springPadBottomRight",
+                "springpadTopLeft": "springPadTopLeft",
+                "springpadBottomLeft": "springPadBottomLeft",
+                "springpadTopRight": "springPadTopRight",
+                "ikeRange": "ikeRangeBlue",
+                "rails": "rails",
+                "bench1": "benches",
+                "bench2": "benches",
+                "teleporterBlue": "teleporterBlue",
+                "teleporterGreen": "teleporterGreen",
+                "teleporterRed": "teleporterRed",
+                "teleporterYellow": "teleporterYellow",
+                "ropeFence": "ropeFences",
+                "intervalDamange": "spikes",
+                "damage": "poison",
+                "healing": "healPad",
+                "slow": "slowPad",
+                "fast": "speedPad",
+                "indestructible": "indestructible",
+                "powerupCrate": "powerCrate",
+                "explosives": "tnt",
+                "gameMapItem": "bolts",
+                "payloadTrack": "payloadTrack",
+                "bouncer": "bumper",
+                "EightBit": "eightbit"
+            },
+            "overrideGamemodes": {
+                "": {
+                    "drawOver": [
+                        {
+                            "tile": "",
+                            "type": "",
+                            "position": "",
+                            "drawOrder": 1
+                        }
+                    ],
+                    "drawEdit": [
+                        {
+                            "tile": "",
+                            "position": ""
+                        }
+                    ],
+                    "tiles": {
+                        "": ""
+                    },
+                    "positionTiles": {
+                        "team1": {
+                            "drawOver": [
+                                {
+                                    "tile": "",
+                                    "type": "",
+                                    "position": "",
+                                    "drawOrder": 1
+                                }
+                            ],
+                            "tiles": {
+                                "": ""
+                            }
+                        },
+                        "team2": {
+                            "drawOver": [
+                                {
+                                    "tile": "",
+                                    "type": "",
+                                    "position": "",
+                                    "drawOrder": 0
+                                }
+                            ],
+                            "tiles": {
+                                "": ""
+                            }
+                        },
+                        "positionDivide": "",
+                        "invert": false
+                    }
+                }
+            }
+        }
+    },
+    "environments": [
+        {
+            "name": "Canyon",
+            "background": {
+                "color1": {
+                    "r": 249,
+                    "g": 166,
+                    "b": 117
+                }
+            }
+        }
+    ],
+    "metadata": {
+
+    }
+}

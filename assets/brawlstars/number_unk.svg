@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="0.31750003mm"
+   height="0.18520784mm"
+   viewBox="0 0 0.31750002 0.18520784"
+   version="1.1"
+   id="svg573225"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   sodipodi:docname="number_unk.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview573227"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="198.86689"
+     inkscape:cx="0.62353266"
+     inkscape:cy="-0.19862532"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs573222" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-84.047906,-169.23008)">
+    <g
+       id="g573208"
+       transform="matrix(0.09999964,0,0,0.09999964,-44.479305,178.54995)">
+      <rect
+         style="fill:#000000;stroke-width:0.972079"
+         id="rect573202"
+         width="3.1750116"
+         height="1.8520851"
+         x="1285.2767"
+         y="-93.199074"
+         ry="0.26458508" />
+      <g
+         aria-label="..."
+         id="text573206"
+         style="font-size:1.82295px;line-height:1.25;text-align:center;text-anchor:middle;fill:#ffffff;stroke-width:0.0455738">
+        <path
+           d="m 1286.6509,-91.629556 q 0,0.01276 -0.1731,0.01276 -0.1714,0 -0.1714,-0.01094 v -0.328131 q 0,-0.01641 0.1714,-0.01641 0.1731,0 0.1731,0.0091 z"
+           style="font-family:'Lilita One';-inkscape-font-specification:'Lilita One'"
+           id="path573319" />
+        <path
+           d="m 1287.0684,-91.629556 q 0,0.01276 -0.1732,0.01276 -0.1713,0 -0.1713,-0.01094 v -0.328131 q 0,-0.01641 0.1713,-0.01641 0.1732,0 0.1732,0.0091 z"
+           style="font-family:'Lilita One';-inkscape-font-specification:'Lilita One'"
+           id="path573321" />
+        <path
+           d="m 1287.4858,-91.629556 q 0,0.01276 -0.1731,0.01276 -0.1714,0 -0.1714,-0.01094 v -0.328131 q 0,-0.01641 0.1714,-0.01641 0.1731,0 0.1731,0.0091 z"
+           style="font-family:'Lilita One';-inkscape-font-specification:'Lilita One'"
+           id="path573323" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+{
+  "name": "bmgjs",
+  "version": "1.0.0",
+  "description": "JavaScript BMG clone for server-side applications.",
+  "main": "launcher.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Elatrock",
+  "license": "ISC",
+  "dependencies": {
+    "sharp": "^0.33.4"
+  }
+}
