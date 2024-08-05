@@ -21,9 +21,9 @@ class Tile {
             throw new Error('!!ERROR: Invalid declaration for tile: missing one of the following arguments: name, code, type')
         }
         else {
-            this.rawJSON.name = this.name;
-            this.rawJSON.code = this.code;
-            this.rawJSON.type = this.type;
+            this.name = this.rawJSON.name;
+            this.code = this.rawJSON.code;
+            this.type = this.rawJSON.type;
         }
 
         // Define variants
@@ -50,6 +50,9 @@ class Tile {
                 }
             }
         }
+        // else {
+        //     throw new Error('!!ERROR: Invalid declaration for tile: must include at least one variant')
+        // }
 
         return this
     }
@@ -111,18 +114,54 @@ class LinkRule {
 }
 
 class DefaultEnvironment {
-    constructor(environment) {
+    constructor(environment, tiles) {
         this.name = "";
         this.background = {};
         this.defaults = {};
+        this.overrideGamemode = {};
+
+        this.rawJSON = environment;
+        this.tiles = tiles;
     }
 
     async initialize() {
+        // Validate defaultEnvironment arguments
+        if ((this.rawJSON.name === undefined) || (this.rawJSON.background === undefined) || (this.rawJSON.defaults === undefined)) {
+            throw new Error('!!ERROR: Invalid declaration for defaultEnvironment: missing one of the following arguments: name, background')
+        }
+        else {
+            this.name = this.rawJSON.name;
+            this.background = this.rawJSON.background;
+            this.defaults = this.rawJSON.defaults;
+        }
 
+        // Define background colors
+        if ((this.background.color1 === undefined) && (this.background.color2 === undefined)) {
+            throw new Error('Invalid declaration for defaultEnvironment: missing the following arguments: color1, color2')
+        }
+        
+        if (((this.background.color1.r === undefined) || (this.background.color1.g === undefined) || (this.background.color1.b === undefined)) ||
+            ((this.background.color2.r === undefined) || (this.background.color2.g === undefined) || (this.background.color2.b === undefined))) {
+            throw new Error('!!ERROR: Invalid declaration for defaultEnvironment: color1 must have r,g,b values')
+        }
+
+        // Define defaults
+        if (this.defaults.tiles !== undefined) {
+            for (const [key, value] of Object.entries(this.tiles)) {
+                if (this.defaults.tiles[key] === undefined) {
+                    throw new Error(`!!ERROR: Invalid declaration for defaultEnvironment: tile ${value.name} must be included in defaults`)
+                }
+                if (value.variants[this.defaults.tiles[value.name]] === undefined) {
+                    throw new Error(`!!ERROR: Invalid declaration for defaultEnvironment: tile ${value.name} does not have variant ${this.defaults.tiles[value.name]}`)
+                }
+            }
+        }
+
+        return this
     }
 }
 
-class Environment extends Environment {
+class Environment extends DefaultEnvironment {
     constructor(defaultEnvironment, gamemode) {
         super();
 
@@ -302,6 +341,7 @@ Initializing...
         await this.readPreset();
         await this.readTiles();
         await this.readLinkRules();
+        await this.readDefaultEnvironment();
     }
 
     // async readOptions() {
@@ -368,6 +408,11 @@ Initializing...
 
     async readDefaultEnvironment() {
         // Create DefaultEnvironment object from preset
+        console.log('Loading defaultEnvironment');
+
+        this.defaultEnvironment = await new DefaultEnvironment(this.presetData.defaultEnvironment, this.tiles).initialize();
+
+        console.log(`Successfully loaded defaultEnvironment\n`);
     }
 
     async readEnvironments() {

@@ -172,7 +172,15 @@
             "display": "Water",
             "name": "water",
             "code": "W",
-            "type": "ENV"
+            "type": "ENV",
+            "variants": {
+                "water": {
+                    "linkTiles": {
+                        "asset": "?binary?.svg",
+                        "assetFolder": "water"
+                    }
+                }
+            }
         },
         {
             "display": "Player 1",
@@ -1802,6 +1810,7 @@
                 "blocking2": "woodBlock",
                 "blocking3": "crate",
                 "blocking4": "barrel",
+                "forest": "grassYellow",
                 "respawningWall": "cactus",
                 "blockingDestroyableWithWeapon": "skull",
                 "fence": "woodenFences",
