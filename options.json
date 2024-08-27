@@ -24,7 +24,21 @@
         {
             "name": "Map Name",
             "grid": [
-
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
             ],
             "environment": "Environment Name",
             "skipTiles": [ "" ],
@@ -59,7 +73,7 @@
                     }
                 }
             ],
-            "emptyBorderAmount": [ 1 ],
+            "border": 1,
             "gamemode": "Gamemode Name"
         }
     ],

@@ -176,9 +176,46 @@
             "variants": {
                 "water": {
                     "linkTiles": {
-                        "asset": "?binary?.svg",
-                        "assetFolder": "water"
-                    }
+                        "c": {
+                            "asset": "?binary?.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "ct": {
+                            "asset": "?binary?.svg",
+                            "offset": {
+                                "top": 100,
+                                "left": 0
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "cl": {
+                            "asset": "?binary?.svg",
+                            "offset": {
+                                "top": 0,
+                                "left": 100
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        },
+                        "ctl": {
+                            "asset": "?binary?.svg",
+                            "offset": {
+                                "top": 100,
+                                "left": 100
+                            },
+                            "order": 0,
+                            "orderHor": 0
+                        }
+                    },
+                    "asset": "?binary?.svg",
+                    "assetFolder": "water",
+                    "linkRules": "water"
                 }
             }
         },
@@ -1201,7 +1238,7 @@
                 "linkTile": "hor"
             },
             "multipleConditions": false,
-            "edgeCase": 1
+            "edge": 1
         },
         "benches": {
             "rules": [
@@ -1246,7 +1283,7 @@
                 "linkTile": "tr"
             },
             "multipleConditions": false,
-            "edgeCase": 0
+            "edge": 0
         },
         "ropeFences": {
             "rules": [
@@ -1267,7 +1304,7 @@
                 "linkTile": "a"
             },
             "multipleConditions": false,
-            "edgeCase": 0
+            "edge": 0
         },
         "payloadCart": {
             "rules": [
@@ -1328,7 +1365,7 @@
                 "linkTile": "c1"
             },
             "multipleConditions": false,
-            "edgeCase": 0
+            "edge": 0
         },
         "payloadTrack": {
             "rules": [
@@ -1447,7 +1484,17 @@
                 "linkTile": "n"
             },
             "multipleConditions": false,
-            "edgeCase": 0
+            "edge": 0
+        },
+        "water": {
+            "rules": [
+
+            ],
+            "defaults": {
+                "linkTile": ""
+            },
+            "multipleConditions": true,
+            "edge": 0
         }
     },
     "gamemodes": [
@@ -1835,69 +1882,18 @@
                 "teleporterRed": "teleporterRed",
                 "teleporterYellow": "teleporterYellow",
                 "ropeFence": "ropeFences",
-                "intervalDamange": "spikes",
+                "intervalDamage": "spikes",
                 "damage": "poison",
                 "healing": "healPad",
                 "slow": "slowPad",
                 "fast": "speedPad",
                 "indestructible": "indestructible",
                 "powerupCrate": "powerCrate",
-                "explosives": "tnt",
+                "explosive": "tnt",
                 "gameMapItem": "bolts",
                 "payloadTrack": "payloadTrack",
                 "bouncer": "bumper",
                 "EightBit": "eightbit"
-            },
-            "overrideGamemodes": {
-                "": {
-                    "drawOver": [
-                        {
-                            "tile": "",
-                            "type": "",
-                            "position": "",
-                            "drawOrder": 1
-                        }
-                    ],
-                    "drawEdit": [
-                        {
-                            "tile": "",
-                            "position": ""
-                        }
-                    ],
-                    "tiles": {
-                        "": ""
-                    },
-                    "positionTiles": {
-                        "team1": {
-                            "drawOver": [
-                                {
-                                    "tile": "",
-                                    "type": "",
-                                    "position": "",
-                                    "drawOrder": 1
-                                }
-                            ],
-                            "tiles": {
-                                "": ""
-                            }
-                        },
-                        "team2": {
-                            "drawOver": [
-                                {
-                                    "tile": "",
-                                    "type": "",
-                                    "position": "",
-                                    "drawOrder": 0
-                                }
-                            ],
-                            "tiles": {
-                                "": ""
-                            }
-                        },
-                        "positionDivide": "",
-                        "invert": false
-                    }
-                }
             }
         }
     },
