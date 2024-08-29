@@ -1,5 +1,40 @@
 const fs = require('node:fs');
 const sharp = require('sharp');
+var parseString = require('xml2js').parseString;
+
+var attrToLowerCase = function(name) {
+    return name.toLowerCase();
+}
+
+async function getDimensions(path) {
+    // Get accurate size of .svg assets
+    let data = await fs.promises.readFile(path, {encoding:'utf8'})
+    let dimensions = null;
+
+    parseString(data, {strict: false, attrkey:'ATTR', attrNameProcessors:[attrToLowerCase]}, function (err, result) {
+        if (err) return null;
+
+        var hasWidthHeightAttr = result.SVG.ATTR['width'] && result.SVG.ATTR['height'];
+        if (hasWidthHeightAttr) {
+            if (result.SVG.ATTR['width'].endsWith('px') && result.SVG.ATTR['height'].endsWith('px')) {
+                height = Number(result.SVG.ATTR['height'].replace('px', '')) * 3.779528;
+                width = Number(result.SVG.ATTR['width'].replace('px', '')) * 3.779528;
+            }
+            else {
+                height = Number(result.SVG.ATTR['height'].replace('mm', '')) * 3.779528;
+                width = Number(result.SVG.ATTR['width'].replace('mm', '')) * 3.779528;
+            }
+        } else {
+            width = Number(result.SVG.ATTR['viewbox'].toString().replace(/^\d+\s\d+\s(\d+\.?[\d])\s(\d+\.?[\d])/, "$1")) * 3.779528;
+            height = Number(result.SVG.ATTR['viewbox'].toString().replace(/^\d+\s\d+\s(\d+\.?[\d])\s(\d+\.?[\d])/, "$2")) * 3.779528;
+        }
+
+        dimensions = {height: parseFloat(height), width: parseFloat(width)}
+    });
+
+    if (dimensions !== null) return dimensions
+    else throw new Error(`!!ERROR: Could not read ${path}`);
+}
 
 // All classes are defined here
 
@@ -9,6 +44,7 @@ class Tile {
         this.name = "";
         this.code = "";
         this.type = "";
+        this.tags = [];
         this.variants = {};
 
         this.assetFolder = assetFolder;
@@ -31,6 +67,12 @@ class Tile {
             this.type = this.rawJSON.type;
         }
 
+        if (this.rawJSON.tags !== undefined) {
+            this.tags = this.rawJSON.tags;
+        }
+
+        console.log(`    Loading ${this.name}`);
+
         // Define variants
         if (this.rawJSON.variants !== undefined) {
             for (const [key, value] of Object.entries(this.rawJSON.variants)) {
@@ -51,17 +93,20 @@ class Tile {
                                 
                             for (const file of await fs.promises.readdir(`${this.assetFolder}/${this.variants[key].assetFolder}`)) {
                                 if (file.endsWith('.svg')) {
+                                    let dimensions = await getDimensions(`${this.assetFolder}/${this.variants[key].assetFolder}/${file}`);
+
                                     this.variants[key].assets[`${file.replace('.svg', '')}`] = await sharp(`${this.assetFolder}/${this.variants[key].assetFolder}/${file}`)
-                                        .resize((await sharp(`${this.assetFolder}/${this.variants[key].assetFolder}/${file}`).metadata()).width * this.sizeMultiplier).png().toBuffer();
+                                        .resize(Math.round(dimensions.width * this.sizeMultiplier)).png().toBuffer();
                                 }
                             }
                         }
                         else {
                             for (const [secondKey, secondValue] of Object.entries(this.variants[key].linkTiles)) {
+                                let dimensions = await getDimensions(`${this.assetFolder}/${this.variants[key].assetFolder !== undefined ? `${this.variants[key].assetFolder}/` : ''}${secondValue.asset}`);
+
                                 this.variants[key].linkTiles[secondKey].buffer = await sharp(`${this.assetFolder}/${this.variants[key].assetFolder !== undefined ? this.variants[key].assetFolder : ''}${secondValue.asset}`)
-                                    .resize((await sharp(`${this.assetFolder}/${this.variants[key].assetFolder !== undefined ? `${this.variants[key].assetFolder}/` : ''}${secondValue.asset}`).metadata()).width * this.sizeMultiplier).png().toBuffer();
-                                console.log((await sharp(`${this.assetFolder}/${this.variants[key].assetFolder !== undefined ? `${this.variants[key].assetFolder}/` : ''}${secondValue.asset}`).metadata()))
-                                console.log(`   Loaded linkTile asset for ${key}: ${secondKey}`);
+                                    .resize(Math.round(dimensions.width * this.sizeMultiplier)).png().toBuffer();
+                                console.log(`        Loaded linkTile asset for ${key}: ${secondKey}`);
                             }
                         }
                     }
@@ -70,10 +115,12 @@ class Tile {
                     }
                 }
                 else {
-                    this.variants[key].buffer = await sharp(`${this.assetFolder}/${value['asset']}`)
-                        .resize((await sharp(`${this.assetFolder}/${this.variants[key].assetFolder !== undefined ? `${this.variants[key].assetFolder}/` : ''}${value['asset']}`).metadata()).width * this.sizeMultiplier).png().toBuffer();
+                    let dimensions = await getDimensions(`${this.assetFolder}/${this.variants[key].assetFolder !== undefined ? `${this.variants[key].assetFolder}/` : ''}${value['asset']}`);
 
-                    console.log(`Loaded asset for ${key}`);
+                    this.variants[key].buffer = await sharp(`${this.assetFolder}/${this.variants[key].assetFolder !== undefined ? `${this.variants[key].assetFolder}/` : ''}${value['asset']}`)
+                        .resize(Math.round(dimensions.width * this.sizeMultiplier)).png().toBuffer();
+
+                    console.log(`        Loaded asset for ${key}`);
                 }
             }
         }
@@ -87,16 +134,24 @@ class Tile {
 
 class LinkRule {
     constructor(linkRule) {
+        this.name = '';
         this.rules = [];
         this.defaults = {};
         this.multipleConditions = false;
-        this.edgeCase = 0;
+        this.edge = 0;
 
         this.rawJSON = linkRule;
     }
 
     async initialize() {
         // Validate linkRule arguments
+        if (this.rawJSON.name === undefined) {
+            throw new Error('!!ERROR: Invalid declaration for linkRule: missing name')
+        }
+        else {
+            this.name = this.rawJSON.name;
+        }
+
         if (this.rawJSON.rules !== undefined && typeof this.rawJSON.rules === 'object') {
             this.rules = this.rawJSON.rules;
         }
@@ -122,22 +177,15 @@ class LinkRule {
             this.multipleConditions = this.rawJSON.multipleConditions;
         }
 
-        // Define edgeCase
-        if (this.rawJSON.edgeCase !== undefined) {
-            this.edgeCase = this.rawJSON.edgeCase;
+        // Define edge
+        if (this.rawJSON.edge !== undefined) {
+            this.edge = this.rawJSON.edge;
         }
+
+        console.log(`    Loaded rule ${this.name}`);
         
         return this
     }
-
-    async getRules() {
-
-    }
-
-    async getDefaults() {
-
-    }
-
 }
 
 class DefaultEnvironment {
@@ -197,7 +245,7 @@ class DefaultEnvironment {
         //     this.overrideGamemodes = this.rawJSON.defaults.overrideGamemodes;
         // }
 
-        console.log(`Loaded defaultEnvironment ${this.name}`)
+        console.log(`    Loaded defaultEnvironment ${this.name}`)
 
         return this
     }
@@ -248,15 +296,13 @@ class Environment {
 
             // We assign tile variants based on what the preset has registered for this environment. If not found, takes values from defaultEnvironment
             if (this.defaults.tiles !== undefined) {
-                for (const [key, value] of Object.entries(this.defaults.tiles)) {
+                for (const [key, value] of Object.entries(this.defaultEnvironment.defaults.tiles)) {
                     if (this.defaults.tiles[key] === undefined) {
                         this.defaults.tiles[key] = this.defaultEnvironment.defaults.tiles[key];
                     }
                     else {
-                        for (const [key, value] of Object.entries(this.tiles)) {
-                            if (value.variants[this.defaults.tiles[value.name]] === undefined) {
-                                throw new Error(`!!ERROR: Invalid declaration for defaultEnvironment: tile ${value.name} does not have variant ${this.defaults.tiles[value.name]}`)
-                            }
+                        if (this.tiles[key].variants[this.defaults.tiles[key]] === undefined) {
+                            throw new Error(`!!ERROR: Invalid declaration for defaultEnvironment: tile ${value.name} does not have variant ${this.defaults.tiles[value.name]}`)
                         }
                     }
                 }
@@ -269,7 +315,7 @@ class Environment {
             this.defaults = this.defaultEnvironment.defaults;
         }
 
-        console.log(`Loaded environment ${this.name}`);
+        console.log(`    Loaded environment ${this.name}`);
 
         return this
     }
@@ -277,39 +323,82 @@ class Environment {
 
 class Gamemode {
     constructor(gamemode) {
-        this.name = [];
+        this.name = '';
+        this.defaults = {};
         this.drawOver = [];
         this.drawEdit = [];
-        this.defaults = {};
 
         this.rawJSON = gamemode;
     }
 
     async initialize() {
+        if (this.rawJSON.name === undefined) {
+            throw new Error('!!ERROR: Invalid declaration for gamemode: missing name')
+        }
+        else {
+            this.name = this.rawJSON.name;
+        }
 
+        if (this.rawJSON.defaults === undefined && (this.rawJSON.defaults.tiles === undefined && this.rawJSON.defaults.positionTiles === undefined)) {
+            throw new Error('!!ERROR: Invalid declaration for gamemode: missing defaults')
+        }
+        else {
+            this.defaults = this.rawJSON.defaults;
+        }
+
+        if (this.rawJSON.drawOver !== undefined) {
+            this.drawOver = this.rawJSON.drawOver;
+        }
+
+        if (this.rawJSON.drawEdit !== undefined) {
+            this.drawEdit = this.rawJSON.drawEdit;
+        }
+
+        console.log(`    Loaded gamemode ${this.name}`);
+
+        return this
     }
 }
 
 class Map {
     constructor(
         options,
-        environment,
         sizeMultiplier,
         ignoreTiles,
         tiles,
-        border
+        linkRules,
+        gamemodes,
+        defaultEnvironment,
+        environments
     ) {
-        this.x = 1;
-        this.y = 1;
+        // this.x = 1;
+        // this.y = 1;
 
         this.name = '';
+        this.tags = {};
         this.options = options;
-        this.environment = environment;
+
+        // You need to `replaceEnvironment` editing this variable with `this.environments`
+        // This also applies to `assetSwitcher`, same logic
+        this.environment = environments[options.environment];
+        this.gamemode = {};
 
         this.sizeMultiplier = sizeMultiplier;
         this.ignoreTiles = ignoreTiles;
+
+        this.defaultEnvironment = defaultEnvironment;
+        this.environments = environments;
+        this.gamemodes = gamemodes;
+        
         this.tiles = tiles;
-        this.border = border;
+        this.linkRules = linkRules;
+
+        // Tile lists to merge together after generation has finished
+        this.compositeBgList = [];
+        this.compositeGmListFirst = [];
+        this.compositeGmListLast = [];
+        this.compositeTileList = [];
+        
     }
 
     async initialize() {
@@ -321,6 +410,11 @@ class Map {
             this.name = 'Map';
         }
 
+        if (this.environment === undefined) {
+            // The provided environment was not found, so we just take everything from defaultEnvironment
+            this.environment = this.defaultEnvironment;
+        }
+
         if (this.options.border === undefined) {
             throw new Error('!!ERROR: Specify border amount')
         }
@@ -329,127 +423,413 @@ class Map {
             throw new Error('!!ERROR: Invalid options format: missing grid')
         }
         else {
-            if (this.options.grid.every(x => x.length !== this.options.grid[0].length)) {
+            if (this.options.grid.every(y => y.length !== this.options.grid[0].length)) {
                 throw new Error('!!ERROR: Invalid grid size. All strings must be of equal length');
             }            
         }
+        const dateStart = new Date();
 
-        const background = await this.drawBackground(this.options.grid[0].length, this.options.grid.length, this.options.border, this.environment.background, this.sizeMultiplier);
-        const tiles = await this.compileTiles(this.options.grid, this.options.replaceTiles, this.sizeMultiplier, this.environment, this.tiles, this.border);
+        console.log(`Drawing map ${this.name}`);
+
+        await this.replaceTiles();
+        await this.replaceEnvironment();
+        await this.assetSwitcher();
+        await this.processGamemode();
+        await this.assignTags();
+
+        const background = await this.drawBackground();
+        await this.compileTiles();
 
         await sharp(background)
-            .composite(tiles)
+            .composite(this.compositeGmListFirst.concat(this.compositeTileList, this.compositeGmListLast))
             .toFile('./output.png')
 
-        console.log('Map saved')
+        console.log('\n    Map saved')
+
+        const dateEnd = new Date();
+
+        console.log(`    Time elapsed: ${(dateEnd.getTime() - dateStart.getTime()) / 1000}\n`)
+        
 
         return this
     }
 
-    async getX() {
-        // Get cursor X coordinate
-        return this.x;
+    // async getX() {
+    //     // Get cursor X coordinate
+    //     return this.x;
+    // }
+
+    // async getY() {
+    //     // Get cursor Y coordinate
+    //     return this.y;
+    // }
+
+    async replaceTiles() {
+        // Replace tile encoding before anything
+
+        if (this.options.replaceTiles === undefined) return
+        
+        console.log('\n    Replacing tiles...');
+
+        for (let y = 0; y <= this.options.grid.length-1; y++) {
+            for (let x = 0; x <= this.options.grid[0].length-1; x++) {
+                // If replaceTiles is enabled
+                for (const rule of this.options.replaceTiles) {
+                    // Iterate through each rule
+                    if (this.options.grid[y][x] === rule.from) {
+                        // If match found, replace
+                        this.options.grid[y] = this.options.grid[y].substring(0,x) + rule.to + this.options.grid[y].substring(x+1);
+                        console.log(`        Replace: X${y+1},Y${x+1} ${rule.from} > ${rule.to}`)
+                    }
+                }
+            }
+        }
     }
 
-    async getY() {
-        // Get cursor Y coordinate
-        return this.y;
+    async replaceEnvironment() {
+        // Change tile variants regardless of the preset-defined environment tiles
+
+        if (this.options.replaceEnvironment === undefined) return
+
+        console.log('\n    Replacing environment tiles...');
+
+        for (const rule of this.options.replaceEnvironment) {
+            // Iterate through each rule
+            if (this.tiles[rule.tile] !== undefined && this.environments[rule.environment] !== undefined) {
+                // The environment and the tile are valid references
+                this.environment.defaults.tiles[rule.tile] = this.environments[rule.environment].defaults.tiles[rule.tile];
+                console.log(`        Replace: ${rule.tile} | ${this.environment.name} > ${rule.environment}`)
+            }
+        }
     }
 
-    async floodFill() {
-        // Algorithm to assign tags recursively to neighboring tiles of the same type
+    async assetSwitcher() {
+        // Switch tile with variants of any kind
+        if (this.options.assetSwitcher === undefined) return
+        
+        console.log('\n    Switching tiles...');
+
+        for (const rule of this.options.assetSwitcher) {
+            if (rule.find !== undefined && rule.replace !== undefined) {
+                // Find/Replace rules exist, we process them
+                // We first check the tiles exist
+
+                if (this.tiles[rule.find.tile].variants[rule.find.variant] !== undefined && this.tiles[rule.replace.tile].variants[rule.replace.variant] !== undefined) {
+                    // If the variants exist, we replace the asset in this.tiles, NOT this.environment
+                    this.tiles[rule.find.tile].variants[rule.find.variant] = this.tiles[rule.replace.tile].variants[rule.replace.variant];
+                    console.log(`        Switch: ${rule.find.tile}[${rule.find.variant}] > ${rule.replace.tile}[${rule.replace.variant}]`)
+                }
+                else {
+                    console.log(`!!ERROR: Invalid assetSwitcher assets, skipped rule`);
+                }
+            }
+        }
     }
 
     async assignTags() {
         // Under-the-hood tile tags to change behavior of linkTiles
+
+        console.log('\n    Assigning tags...')
+
+        for (let y = 0; y <= this.options.grid.length-1; y++) {
+            for (let x = 0; x <= this.options.grid[0].length-1; x++) {
+                for (const [key, value] of Object.entries(this.tiles)) {
+                    // If the tile exists and it matches the code, it's assigned
+                    if (this.options.grid[y][x] === value.code) {
+                        if (value.tags !== undefined) {
+                            for (const tag of value.tags) {
+                                console.log(`        Tag: X${y+1},Y${x+1} ${tag}`)
+                                this.tags[`${x},${y}`] === undefined ? this.tags[`${x},${y}`] = [{x: x, y: y, tag: tag}] : this.tags[`${x},${y}`].push({x: x, y: y, tag: tag});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        console.log('    Tags assigned');
     }
 
     async alterTiles() {
         /* Alter tiles based on gamemode or environment preferences, hierarchy goes down as follows:
 
-            - replaceTiles
-            - drawBackground
-                - skipTiles
-            - ignoreTiles
-            - environment
-                - gamemode
-            - overrideEnvironment
-            - specialTileRules
-            - assetSwitchers
+            + replaceTiles
+            + defaultEnvironment
+            + environment
+            + replaceEnvironment
+            + gamemode
+            + assetSwitchers
+            + drawBackground
+                + skipTiles
+            - ignoreTiles               || Will add later
+            /   - specialTileRules      || Will add later
             - order
             - orderHor
         */
     }
 
-    async compileTiles(grid, replaceTiles, sizeMultiplier, environment, tiles, border) {
-        // Replace tile encoding
-        let compositeTileList = [];
+    async compileTiles() {
+        console.log('\n    Drawing tiles...');
 
-        for (let x = 0; x <= grid.length-1; x++) {
-            for (let y = 0; y <= grid[0].length-1; y++) {
-                if (replaceTiles !== undefined) {
-                    for (const rule of replaceTiles) {
-                        if (grid[x][y] === rule.from) {
-                            console.log(`   Replace: X${x+1},Y${y+1} ${rule.from} > ${rule.to}`)
-                            grid[x] = grid[x].substring(0,y) + rule.to + grid[x].substring(y+1)
-                        }
-                    }
-                }
+        // replaceEnvironment replaces tiles from the environment passed with the specified ones
+
+        for (let y = 0; y <= this.options.grid.length-1; y++) {
+            for (let x = 0; x <= this.options.grid[0].length-1; x++) {
                 let tile = null;
+                let found = false;
 
-                for (const [key, value] of Object.entries(tiles)) {
-                    if (grid[x][y] === value.code) {
-                        tile = value;
+                for (const [key, value] of Object.entries(this.tiles)) {
+                    // If the tile exists and it matches the code, it's assigned
+                    if (this.options.grid[y][x] === value.code) {
+                        // We check if we should skip this tile for rendering (if it is included in skipTiles)
+                        if (this.options.skipTiles !== undefined) {
+                            for (const innerTile of this.options.skipTiles) {
+                                if (innerTile === value.code) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (!found) {
+                                tile = value;
+                            }
+                        }
+                        else {
+                            tile = value;
+                        };
                     }
                 }
 
                 if (tile !== null) {
-                    let tileOffsetLeft = tile.variants[environment.defaults.tiles[tile.name]].offset.left > 0 ? Math.round((1/1000)*tile.variants[environment.defaults.tiles[tile.name]].offset.left*sizeMultiplier)*-1 : Math.round((1/1000)*tile.variants[environment.defaults.tiles[tile.name]].offset.left*sizeMultiplier)
-                    let tileOffsetTop = tile.variants[environment.defaults.tiles[tile.name]].offset.top > 0 ? Math.round((1/1000)*tile.variants[environment.defaults.tiles[tile.name]].offset.top*sizeMultiplier)*-1 : Math.round((1/1000)*tile.variants[environment.defaults.tiles[tile.name]].offset.top*sizeMultiplier)
+                    // If the tile exists
+                    let assignedTile = null;
 
-                    compositeTileList.push(
+                    if (this.gamemode.defaults.positionTiles !== undefined) {
+                        let i = 0;
+                        for (const team of [this.gamemode.defaults.positionTiles.team1, this.gamemode.defaults.positionTiles.team2]) {
+                            if (team.tiles !== undefined) {
+                                for (const [key, value] of Object.entries(team.tiles)) {
+                                    if (typeof value === 'object') {
+                                        // Several environment-dependant variants of the same tile
+                                        if (value[this.environment.name] !== undefined) {
+                                            // The environment matches
+                                            if (this.tiles[key].variants[value[this.environment.name]] !== undefined) {
+                                                // The variant exists
+                                                if (this.gamemode.defaults.positionTiles.positionDivide === 'ver') {
+                                                    if (x > Math.round(this.options.grid[0].length / 2) && i === 0) {
+                                                        this.environment.defaults.tiles[key] = value[this.environment.name];
+                                                    }
+                                                    else if (x < Math.round(this.options.grid[0].length / 2) && i === 1) {
+                                                        this.environment.defaults.tiles[key] = value[this.environment.name];
+                                                    }
+                                                }
+                                                else {
+                                                    if (y > Math.round(this.options.grid.length / 2) && i === 0) {
+                                                        this.environment.defaults.tiles[key] = value[this.environment.name];
+                                                    }
+                                                    else if (y < Math.round(this.options.grid.length / 2) && i === 1) {
+                                                        this.environment.defaults.tiles[key] = value[this.environment.name];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            // The environment doesn't match
+                                            if (this.tiles[key].variants[value.default] !== undefined) {
+                                                // The variant exists
+                                                if (this.gamemode.defaults.positionTiles.positionDivide === 'ver') {
+                                                    if (x > Math.round(this.options.grid[0].length / 2) && i === 0) {
+                                                        this.environment.defaults.tiles[key] = value.default;
+                                                    }
+                                                    else if (x < Math.round(this.options.grid[0].length / 2) && i === 1) {
+                                                        this.environment.defaults.tiles[key] = value.default;
+                                                    }
+                                                }
+                                                else {
+                                                    if (y > Math.round(this.options.grid.length / 2) && i === 0) {
+                                                        this.environment.defaults.tiles[key] = value.default;
+                                                    }
+                                                    else if (y < Math.round(this.options.grid.length / 2) && i === 1) {
+                                                        this.environment.defaults.tiles[key] = value.default;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if (typeof value === 'string') {
+                                        // The variant is global
+                                        if (this.tiles[key].variants[value] !== undefined) {
+                                            // The variant exists
+                                            if (this.gamemode.defaults.positionTiles.positionDivide === 'ver') {
+                                                if (x > Math.round(this.options.grid[0].length / 2) && i === 0) {
+                                                    this.environment.defaults.tiles[key] = value;
+                                                }
+                                                else if (x < Math.round(this.options.grid[0].length / 2) && i === 1) {
+                                                    this.environment.defaults.tiles[key] = value;
+                                                }
+                                            }
+                                            else {
+                                                if (y > Math.round(this.options.grid.length / 2) && i === 0) {
+                                                    this.environment.defaults.tiles[key] = value;
+                                                }
+                                                else if (y < Math.round(this.options.grid.length / 2) && i === 1) {
+                                                    this.environment.defaults.tiles[key] = value;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            i += 1;
+                        }
+                    }
+
+                    // If this variant has linkTiles
+                    if (tile.variants[this.environment.defaults.tiles[tile.name]].linkTiles !== undefined && tile.variants[this.environment.defaults.tiles[tile.name]].linkRules !== undefined) {
+                        let binary = [];
+                        let rawBinary = '';
+                        let match = false;
+                        let matchTag = false;
+
+                        let matchRules = [];
+
+                        for (const rule of this.linkRules[tile.variants[this.environment.defaults.tiles[tile.name]].linkRules].rules) {
+                            // Iterate through each rule
+                            binary = [];
+                            rawBinary = await this.linkTiles(y, x, this.linkRules[tile.variants[this.environment.defaults.tiles[tile.name]].linkRules].edge, rule.replaceCode);
+
+                            for (const char of rawBinary) {
+                                binary.push(char);
+                            }
+
+                            let accuracy = 0;
+
+                            for (let i = 0; i < 8; i++) {
+                                if (rule.condition[i] === '*')
+                                    accuracy += 1;
+                                else if (rule.condition[i] === binary[i])
+                                    accuracy += 1;
+                            }
+
+                            if (accuracy === 8) {
+                                // If the condition matches
+                                match = true;
+
+                                // Check requiredGamemode match
+                                if (rule.requiredGamemode !== undefined) {
+                                    if (rule.requiredGamemode !== this.options.gamemode) {
+                                        match = false;
+                                    }
+                                }
+                            
+                                // Check requiredTag match
+                                if (rule.requiredTag !== undefined) {
+                                    if (this.tags[`${x},${y}`] !== undefined) {
+                                        for (const tag of this.tags[`${x},${y}`]) {
+                                            if (tag.tag === rule.requiredTag) {
+                                                matchTag = true;
+                                            }
+                                        }
+                                    }
+
+                                    if (matchTag === false) {
+                                        match = false;
+                                    }
+                                }
+
+                                if (match) {
+                                    matchRules.push(rule);
+
+                                    if (!this.linkRules[tile.variants[this.environment.defaults.tiles[tile.name]].linkRules].multipleConditions) {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (matchRules.length > 0) {
+                            // There was a match in the condition
+                            for (const rule of matchRules) {
+                                if (rule.changeBinary !== undefined) {
+                                    for (let i = 0; i < rule.changeBinary.length; i++) {
+                                        binary[Number(rule.changeBinary[i].split('a')[1])] = rule.changeBinary[i].split('a')[0];
+                                    }
+                                }
+
+                                if (tile.variants[this.environment.defaults.tiles[tile.name]].assets !== undefined) {
+                                    // If binary linkTiles are enabled
+                                    assignedTile = tile.variants[this.environment.defaults.tiles[tile.name]].linkTiles[rule.linkTile];
+                                    
+                                    assignedTile.asset = `${binary.join('', binary)}.svg`;
+                                    assignedTile.buffer = tile.variants[this.environment.defaults.tiles[tile.name]].assets[`${binary.join('', binary)}`];
+                                }
+                                else {
+                                    // If binary linkTiles are NOT enabled
+                                    assignedTile = tile.variants[this.environment.defaults.tiles[tile.name]].linkTiles[rule.linkTile];
+                                }
+                            }
+                        }
+                        else {
+                            // No match, use default
+                            assignedTile = tile.variants[this.environment.defaults.tiles[tile.name]].linkTiles[this.linkRules[tile.variants[this.environment.defaults.tiles[tile.name]].linkRules].defaults.linkTile];
+                            
+                            if (tile.variants[this.environment.defaults.tiles[tile.name]].assets !== undefined) {
+                                // If binary linkTiles are enabled
+                                
+                                if (tile.variants[this.environment.defaults.tiles[tile.name]].assets[`${binary.join('', binary)}`] !== undefined) {
+                                    // The binary tile didn't match any rule, but it exists so we let it pass
+                                    assignedTile.asset = `${binary.join('', binary)}.svg`;
+                                    assignedTile.buffer = tile.variants[this.environment.defaults.tiles[tile.name]].assets[`${binary.join('', binary)}`];
+                                }
+                                else {
+                                    // We assign the first item in the array as fallback
+                                    assignedTile.asset = `${tile.variants[this.environment.defaults.tiles[tile.name]].assets[0]}.svg`;
+                                    assignedTile.buffer = tile.variants[this.environment.defaults.tiles[tile.name]].assets[0];
+                                }
+                            }
+                        }
+                    }
+                    // If this variant does NOT have linkTiles
+                    else {
+                        assignedTile = tile.variants[this.environment.defaults.tiles[tile.name]];
+                    }
+
+                    let tileOffsetLeft = assignedTile.offset.left > 0 ? Math.round((1/1000)*assignedTile.offset.left*this.sizeMultiplier)*-1 : Math.round((1/1000)*assignedTile.offset.left*this.sizeMultiplier)
+                    let tileOffsetTop = assignedTile.offset.top > 0 ? Math.round((1/1000)*assignedTile.offset.top*this.sizeMultiplier)*-1 : Math.round((1/1000)*assignedTile.offset.top*this.sizeMultiplier)
+
+                    this.compositeTileList.push(
                         {
-                            input: tile.variants[environment.defaults.tiles[tile.name]].buffer,
-                            left: ((y+border)*sizeMultiplier) + tileOffsetLeft,
-                            top: ((x+border)*sizeMultiplier) + tileOffsetTop
+                            input: assignedTile.buffer,
+                            left: ((x+this.options.border)*this.sizeMultiplier) + tileOffsetLeft,
+                            top: ((y+this.options.border)*this.sizeMultiplier) + tileOffsetTop
                         }
                     )
                 }
             }
+
+            // Do `orderHor` here after a line has been read...?
         }
-        console.log('\n')
 
-        return compositeTileList
+        console.log('    Tiles drawn');
     }
 
-    async overrideEnvironment() {
-        // Change tile variants regardless of the preset-defined environment tiles
-    }
+    // async specialTileRules() {
+    //     // Change tile variants if the condition is met
+    // }
 
-    async specialTileRules() {
-        // Change tile variants if the condition is met
-    }
-
-    async assetSwitcher() {
-        // Switch tile with variants of any kind
-    }
-
-    async drawBackground(xWidth, yLength, border, background, sizeMultiplier) {
+    async drawBackground() {
         // Draw background of the map based on grid size, border and sizeMultiplier
-        console.log('   Drawing background...')
-
-        const dateStart = new Date();
+        console.log('\n    Drawing background...')
 
         // Read background colors
+        let lightBg = null;
         let darkBg = null;
         let bufferBg = null;
 
-        let compositeBgList = [];
-
         bufferBg = await sharp({
             create: {
-                width: (xWidth + (border*2)) * sizeMultiplier,
-                height: (yLength + (border*2)) * sizeMultiplier,
+                width: (this.options.grid[0].length + (this.options.border*2)) * this.sizeMultiplier,
+                height: (this.options.grid.length + (this.options.border*2)) * this.sizeMultiplier,
                 channels: 4,
                 background: {r: 0,
                              g: 0,
@@ -458,81 +838,321 @@ class Map {
             }
         }).png().toBuffer();
 
-        if (background.color1 !== undefined && background.color2 !== undefined) {
-            compositeBgList.push({input: await sharp({
-                        create: {
-                            width: xWidth * sizeMultiplier,
-                            height: yLength * sizeMultiplier,
-                            channels: 4,
-                            background: {r: background.color1.r,
-                                         g: background.color1.g,
-                                         b: background.color1.b}
-                        }}).png().toBuffer(),
-                    top: border*sizeMultiplier,
-                    left: border*sizeMultiplier})
+        if (this.environment.background.color1 !== undefined && this.environment.background.color2 !== undefined) {
+            // compositeBgList.push({input: await sharp({
+            //             create: {
+            //                 width: this.options.grid[0].length * sizeMultiplier,
+            //                 height: this.options.grid.length * sizeMultiplier,
+            //                 channels: 4,
+            //                 background: {r: background.color1.r,
+            //                              g: background.color1.g,
+            //                              b: background.color1.b}
+            //             }}).png().toBuffer(),
+            //         top: border*sizeMultiplier,
+            //         left: border*sizeMultiplier})
+
+            lightBg = await sharp({
+                create: {
+                    width: this.sizeMultiplier,
+                    height: this.sizeMultiplier,
+                    channels: 4,
+                    background: {r: Math.round(this.environment.background.color1.r),
+                                 g: Math.round(this.environment.background.color1.g),
+                                 b: Math.round(this.environment.background.color1.b)}
+                }
+            }).png().toBuffer();
 
             darkBg = await sharp({
                 create: {
-                    width: sizeMultiplier,
-                    height: sizeMultiplier,
+                    width: this.sizeMultiplier,
+                    height: this.sizeMultiplier,
                     channels: 4,
-                    background: {r: background.color2.r,
-                                 g: background.color2.g,
-                                 b: background.color2.b}
+                    background: {r: this.environment.background.color2.r,
+                                 g: this.environment.background.color2.g,
+                                 b: this.environment.background.color2.b}
                 }
             }).png().toBuffer();
         }
-        else if (background.color1 !== undefined) {
-            compositeBgList.push({input: await sharp({
-                        create: {
-                            width: xWidth * sizeMultiplier,
-                            height: yLength * sizeMultiplier,
-                            channels: 4,
-                            background: {r: background.color1.r,
-                                         g: background.color1.g,
-                                         b: background.color1.b}
-                        }}).png().toBuffer(),
-                    top: border*sizeMultiplier,
-                    left: border*sizeMultiplier})
+        else if (this.environment.background.color1 !== undefined) {
+            // compositeBgList.push({input: await sharp({
+            //             create: {
+            //                 width: this.options.grid[0].length * sizeMultiplier,
+            //                 height: this.options.grid.length * sizeMultiplier,
+            //                 channels: 4,
+            //                 background: {r: background.color1.r,
+            //                              g: background.color1.g,
+            //                              b: background.color1.b}
+            //             }}).png().toBuffer(),
+            //         top: border*sizeMultiplier,
+            //         left: border*sizeMultiplier})
+
+            lightBg = await sharp({
+                create: {
+                    width: this.sizeMultiplier,
+                    height: this.sizeMultiplier,
+                    channels: 4,
+                    background: {r: Math.round(this.environment.background.color1.r),
+                                 g: Math.round(this.environment.background.color1.g),
+                                 b: Math.round(this.environment.background.color1.b)}
+                }
+            }).png().toBuffer();
 
             darkBg = await sharp({
                 create: {
-                    width: sizeMultiplier,
-                    height: sizeMultiplier,
+                    width: this.sizeMultiplier,
+                    height: this.sizeMultiplier,
                     channels: 4,
-                    background: {r: Math.round(background.color1.r * (242 / 255)),
-                                 g: Math.round(background.color1.g * (242 / 255)),
-                                 b: Math.round(background.color1.b * (242 / 255))}
+                    background: {r: Math.round(this.environment.background.color1.r * (242 / 255)),
+                                 g: Math.round(this.environment.background.color1.g * (242 / 255)),
+                                 b: Math.round(this.environment.background.color1.b * (242 / 255))}
                 }
             }).png().toBuffer();
         }
 
         // Alternate colors
-        for (let x = 0; x <= xWidth-1; x++) {
-            for (let y = 0; y <= yLength-1; y++) {
-                if ((0 == ((x + (y % 2)) % 2))) {
-                    // Darker BG color
-                    compositeBgList.push({input: darkBg, top: (y+border) * 100, left: (x+border) * 100});
+        // let nothing = await sharp({
+        //     create: {
+        //         width: sizeMultiplier,
+        //         height: sizeMultiplier,
+        //         channels: 4,
+        //         background: {r: 0,
+        //                      g: 0,
+        //                      b: 0,
+        //                      alpha: 0}
+        //     }
+        // }).png().toBuffer();
+
+        console.log('        Skipping tiles...')
+        for (let y = 0; y <= this.options.grid.length-1; y++) {
+            for (let x = 0; x <= this.options.grid[0].length-1; x++) {
+                // We skip tile rendering if needed, this also skips background rendering
+                let found = false;
+
+                if (this.options.skipTiles !== undefined) {
+                    for (const tile of this.options.skipTiles) {
+                        if (tile === this.options.grid[y][x]) {
+                            console.log(`            Skipped: ${tile}`);
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!found) {
+                    if ((0 == ((y + (x % 2)) % 2))) {
+                        // Darker BG color
+                        this.compositeBgList.push({input: darkBg, top: (y+this.options.border) * this.sizeMultiplier, left: (x+this.options.border) * this.sizeMultiplier});
+                    }
+                    else {
+                        this.compositeBgList.push({input: lightBg, top: (y+this.options.border) * this.sizeMultiplier, left: (x+this.options.border) * this.sizeMultiplier});
+                    }
                 }
             }
         }
 
         bufferBg = await sharp(bufferBg)
-            .composite(compositeBgList)
+            .composite(this.compositeBgList)
             .toBuffer();
 
-        const dateEnd = new Date();
-
-        console.log(`Time elapsed: ${(dateEnd.getTime() - dateStart.getTime()) / 1000}`)
+        console.log('    Background drawn');
         return bufferBg
     }
     
-    async drawOver() {
-        // Draw tiles without altering the array code
+    // async drawOver() {
+    //     // Draw tiles without altering the array code
+    // }
+
+    // async drawEdit() {
+    //     // Draw tiles altering the array code. Gamemode-specific
+    // }
+
+    async processGamemode() {
+        // Read information about the provided gamemode to alter behavior
+        
+        console.log('\n    Processing gamemode...');
+        
+        
+        let found = false;
+        
+        if (this.options.gamemode === undefined) return
+        else
+            // Validate gamemode
+            if (this.gamemodes[this.options.gamemode] !== undefined) {
+                this.gamemode = this.gamemodes[this.options.gamemode];
+
+                found = true;
+            }
+
+            if (!found) return
+
+        // Gamemode has been included in options
+        // We check if any defaults have been changed
+
+        for (const [key, value] of Object.entries(this.gamemode.defaults.tiles)) {
+            if (typeof value === 'object') {
+                // Several environment-dependant variants of the same tile
+                if (value[this.environment.name] !== undefined) {
+                    // The environment matches
+                    if (this.tiles[key].variants[value[this.environment.name]] !== undefined) {
+                        // The variant exists
+                        this.environment.defaults.tiles[key] = value[this.environment.name];
+                    }
+                }
+                else {
+                    // The environment doesn't match
+                    if (this.tiles[key].variants[value.default] !== undefined) {
+                        // The variant exists
+                        this.environment.defaults.tiles[key] = value.default;
+                    }
+                }
+            }
+            else if (typeof value === 'string') {
+                // The variant is global
+                if (this.tiles[key].variants[value] !== undefined) {
+                    // The variant exists
+                    this.environment.defaults.tiles[key] = value;
+                }
+            }
+        }
+
+        // Now we read the special rules provided for gamemodes
+
+        if (this.gamemode.drawEdit !== undefined) {
+            // First, we read drawEdit to see if we need to edit grid data
+            await this.drawEdit(this.gamemode.drawEdit);
+        }
+
+        if (this.gamemode.drawOver !== undefined) {
+            // Then, we read drawOver to see if we need to append any assets
+            await this.drawOver(this.gamemode.drawOver);
+        }
+
+        if (this.gamemode.defaults.positionTiles !== undefined) {
+            // positionTiles are enabled
+            // Validate positionTiles
+            if (this.gamemode.defaults.positionTiles.team1 !== undefined && this.gamemode.defaults.positionTiles.team2 !== undefined) {
+                // Both teams are defined, proceed with rules
+                // In this function, we only read drawOver rules, any individual tiles depending on position will be read in compileTiles
+                for (const team of [this.gamemode.defaults.positionTiles.team1, this.gamemode.defaults.positionTiles.team2]) {
+                    // We read drawOver
+                    if (team.drawOver !== undefined) {
+                        if (this.gamemode.defaults.positionTiles.positionDivide === 'ver') {
+                            for (const rule of team.drawOver) {
+                                if (rule.position !== undefined) {
+                                    rule.position = `${rule.position.split(',')[1]},${rule.position.split(',')[0]}`;
+                                }
+                            }
+                        }
+
+                        await this.drawOver(team.drawOver);
+                    }
+                }
+            }
+        }
+
+        console.log('    Gamemode processed')
     }
 
-    async drawEdit() {
-        // Draw tiles altering the array code
+    async drawEdit(drawEdit) {
+        // drawEdit alters grid code. Gamemode-specific
+        // drawEdit included validation
+        for (const rule of drawEdit) {
+            if (rule.tile !== undefined && rule.position !== undefined) {
+                // The rule has correct params
+                if (this.tiles[rule.tile] !== undefined) {
+                    // The tile exists
+
+                    const anchors = await this.validateAnchors(rule.position);
+
+                    if (anchors.match) {
+                        if (this.options.grid[anchors.y][anchors.x] !== this.tiles[rule.tile].code) {
+                            this.options.grid[anchors.y] = this.options.grid[anchors.y].substring(0,anchors.x) + this.tiles[rule.tile].code + this.options.grid[anchors.y].substring(anchors.x+1);
+
+                            console.log(`        drawEdit: X${anchors.y+1},Y${anchors.x+1} > ${rule.tile}`);
+                        }
+                        // else {
+                        //     console.log(`        drawEdit skip: X${anchors.y+1},Y${anchors.x+1} > ${rule.tile} - Condition already met`);
+                        // }
+                    }
+                }
+            }
+        }
+    }
+
+    async drawOver(drawOver) {
+        // drawOver appends tiles to draw without altering grid code. Gamemode-specific
+        for (const rule of drawOver) {
+            if (rule.tile !== undefined && rule.variant !== undefined && rule.position !== undefined && rule.drawOrder !== undefined) {
+                // The rule has correct params
+                if (this.tiles[rule.tile] !== undefined !== undefined) {
+                    // The tile exists
+                    const anchors = await this.validateAnchors(rule.position);
+
+                    if (anchors.match) {
+                        if (typeof rule.variant === 'object') {
+                            let assignedTile = (this.tiles[rule.tile].variants[rule.variant[this.environment.name]] !== undefined) ? this.tiles[rule.tile].variants[rule.variant[this.environment.name]] : this.tiles[rule.tile].variants[rule.variant.default];
+
+                            let tileOffsetLeft = assignedTile.offset.left > 0 ? Math.round((1/1000)*assignedTile.offset.left*this.sizeMultiplier)*-1 : Math.round((1/1000)*assignedTile.offset.left*this.sizeMultiplier)
+                            let tileOffsetTop = assignedTile.offset.top > 0 ? Math.round((1/1000)*assignedTile.offset.top*this.sizeMultiplier)*-1 : Math.round((1/1000)*assignedTile.offset.top*this.sizeMultiplier)
+                            
+                            if (rule.drawOrder === 1) {
+                                this.compositeGmListFirst.push(
+                                    {
+                                        input: assignedTile.buffer,
+                                        left: ((anchors.x+this.options.border)*this.sizeMultiplier) + tileOffsetLeft,
+                                        top: ((anchors.y+this.options.border)*this.sizeMultiplier) + tileOffsetTop
+                                    }
+                                )
+                            }
+                            else if (rule.drawOrder === 2) {
+                                this.compositeGmListLast.push(
+                                    {
+                                        input: assignedTile.buffer,
+                                        left: ((anchors.x+this.options.border)*this.sizeMultiplier) + tileOffsetLeft,
+                                        top: ((anchors.y+this.options.border)*this.sizeMultiplier) + tileOffsetTop
+                                    }
+                                )
+                            }
+                            else {
+                                throw new Error('!!ERROR: Invalid drawOrder in gamemode: must be 1 or 2')
+                            }
+
+                            console.log(`        drawOver: X${anchors.x+1},Y${anchors.y+1} > ${rule.tile}`);
+                        }
+                        else if (typeof rule.variant === 'string') {
+                            let assignedTile = this.tiles[rule.tile].variants[rule.variant];
+
+                            let tileOffsetLeft = assignedTile.offset.left > 0 ? Math.round((1/1000)*assignedTile.offset.left*this.sizeMultiplier)*-1 : Math.round((1/1000)*assignedTile.offset.left*this.sizeMultiplier)
+                            let tileOffsetTop = assignedTile.offset.top > 0 ? Math.round((1/1000)*assignedTile.offset.top*this.sizeMultiplier)*-1 : Math.round((1/1000)*assignedTile.offset.top*this.sizeMultiplier)
+                            
+                            if (rule.drawOrder === 1) {
+                                this.compositeGmListFirst.push(
+                                    {
+                                        input: assignedTile.buffer,
+                                        left: ((anchors.x+this.options.border)*this.sizeMultiplier) + tileOffsetLeft,
+                                        top: ((anchors.y+this.options.border)*this.sizeMultiplier) + tileOffsetTop
+                                    }
+                                )
+                            }
+                            else if (rule.drawOrder === 2) {
+                                this.compositeGmListLast.push(
+                                    {
+                                        input: assignedTile.buffer,
+                                        left: ((anchors.x+this.options.border)*this.sizeMultiplier) + tileOffsetLeft,
+                                        top: ((anchors.y+this.options.border)*this.sizeMultiplier) + tileOffsetTop
+                                    }
+                                )
+                            }
+                            else {
+                                throw new Error('!!ERROR: Invalid drawOrder in gamemode: must be 1 or 2')
+                            }
+
+                            console.log(`        drawOver: X${anchors.x+1},Y${anchors.y+1} > ${rule.tile}`);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     async checkOrder() {
@@ -543,326 +1163,343 @@ class Map {
         // Check the order of tiles in the Z coordinate for the row and delay rendering depending on their value
     }
 
-    async evaluateCondition(target, condition) {
-        let i = 0;
-        let match = true;
-    
-        for (const char of target) {
-            if (condition[i] !== char.value) {
-                if (condition[i] !== '*') {
-                    match = false;
-                }
-            }
-    
-            i+=1;
-        }
-    
-        return match
+    async floodFill() {
+        // Algorithm to assign tags recursively to neighboring tiles of the same type
     }
-    
-    async convertBinary(target, neighbors) {
-        let str = '';
-    
-        for (const char of neighbors) {
-            if (char === target) {
-                str += '1';
-            }
-            else {
-                str += '0';
-            }
-        }
-    
-        return str
-    }
-    
-    async checkNeighborTiles(array, coordinates, edge) {
-        // Check adjacent tiles based on XY coordinate
 
-        let target = array[coordinates.x][coordinates.y];
-    
-        console.log(`Target: ${target}\nPOS: X${coordinates.x}, Y${coordinates.y}`);
-    
-        let neighbors = [];
-    
-        for (let x = coordinates.x-1; x <= coordinates.x+1; x++) {
-            for (let y = coordinates.y-1; y <= coordinates.y+1; y++) {
-                if (x !== coordinates.x || y !== coordinates.y) {
-                    // If this is not the target tile
-                    if ((x < 0 || y < 0) || (x > array.length-1 || y > array[array.length-1].length)) {
-                        // If the tile is outside the grid
-                        neighbors.push(undefined);
+    async validateAnchors(anchor) {
+        const position = anchor.split(',');
+
+        let x = 0;
+        let y = 0;
+
+        let xFound = false;
+        let yFound = false;
+
+        if (position.length === 2) {
+            // Valid position params
+            switch (position[0]) {
+                // X Coordinate Anchor
+                case 'l':
+                    // Left
+                    x = 0;
+                    xFound = true;
+                    break;
+                case 'm':
+                    // Middle
+                    x = Math.round((this.options.grid[0].length) / 2) - 1
+                    xFound = true;
+                    break;
+                case 'r':
+                    // Right
+                    x = this.options.grid[0].length-1;
+                    xFound = true;
+                    break;
+                default:
+                    // The coordinate is a set number
+                    try {
+                        x = Number(position[0]);
+
+                        x = (x > 0) ? x : (this.options.grid[0].length-1)+x;
+                        xFound = true;
                     }
-                    else {
-                        // If the tile is inside the grid
-                        neighbors.push(array[x][y]);
+                    catch (err) {
+                        console.log(err);
                     }
-                }
-            }
-        }
-    
-        // Check edges
-    
-        /*
-    
-        01235
-      X X X
-      X M . . .
-      X . . . .
-        . . . .
-        . . . .
-    
-        01247
-            X X X
-        . . . M X
-        . . . . X
-        . . . .
-        . . . .
-    
-        012
-        X X X
-        . M . .
-        . . . .
-        . . . .
-        . . . .
-    
-        */
-    
-        let corValue = null;
-        let sideValue = null;
-        let sideBotValue = null;
-    
-        if (neighbors[1] === undefined) {
-            // Top Row
-            for (let i = 0; i <= 2; i++) {
-                // Top [0,1,2] Only
-                switch (edge) {
-                    case 0:
-                        // Different
-                        neighbors[i] = '!!INVALID_POS';
-                        break;
-                    case 1:
-                        // Mirror
-                        neighbors[i] = target;
-                        break;
-                    case 2:
-                        // Copy
-                        if (i === 1) {
-                            // N of target
-                            neighbors[i] = target;
-                        }
-                        else {
-                            // NW, NE of target
-                            neighbors[i] = array[coordinates.x][array[coordinates.x][coordinates.y-1] !== undefined ? coordinates.y-1 : (array[coordinates.x][coordinates.y+1] !== undefined ? coordinates.y+1 : '!!INVALID_POS')];
-                        }
-                        break;
-                }
-            }
-            
-            if (neighbors[3] === undefined) {
-                // Left Corner
-                corValue = 0; // NW of target
-                sideValue = 3; // W of target
-                sideBotValue = 5; // SW of target
-            }
-            if (neighbors[4] === undefined) {
-                // Right Corner
-                corValue = 2; // NE of target
-                sideValue = 4; // E of target
-                sideBotValue = 7; // SE of target
-            }
-    
-            if (corValue !== null && sideValue !== null && sideBotValue !== null) {
-                // Check Top Corners if they match, otherwise ignore
-                if (edge === 1) {
-                    // Mirror: true
-                    neighbors[corValue] = target;
-                }
-                else {
-                    // Different, Copy: false
-                    neighbors[corValue] = '!!INVALID_POS';
-                }
-    
-                switch (edge) {
-                    case 0:
-                        // Different
-                        neighbors[sideValue] = '!!INVALID_POS';
-                        neighbors[sideBotValue] = '!!INVALID_POS';
-                        break;
-                    case 1:
-                        // Mirror
-                        neighbors[sideValue] = target;
-                        neighbors[sideBotValue] = target;
-                        break;
-                    case 2:
-                        // Copy
-                        neighbors[sideValue] = target;
-                        neighbors[sideBotValue] = array[coordinates.x][coordinates.y+1];
-                        break;
-                }
-            }
-        }
-    
-        /*
-    
-        035
-        X . . . .
-        X M . . .
-        X . . . .
-        . . . .
-    
-        247
-        . . . . X
-        . . . M X
-        . . . . X
-        . . . .
-    
-        */
-    
-        else if ((neighbors[3] === undefined || neighbors[4] === undefined) && (neighbors[1] !== undefined && neighbors[6] !== undefined)) {
-            // Middle Row
-    
-            // Middle [3, 4] Only
-            if (neighbors[3] === undefined) {
-                // Left Side
-                corValue = 0;
-                sideValue = 3;
-                sideBotValue = 5;
-            }
-            if (neighbors[4] === undefined) {
-                // Right Side
-                corValue = 0;
-                sideValue = 4;
-                sideBotValue = 7;
-            }
-    
-            switch (edge) {
-                case 0:
-                    neighbors[corValue] = '!!INVALID_POS';
-                    neighbors[sideValue] = '!!INVALID_POS';
-                    neighbors[sideBotValue] = '!!INVALID_POS';
                     break;
-                case 1:
-                    neighbors[corValue] = target;
-                    neighbors[sideValue] = target;
-                    neighbors[sideBotValue] = target;
+            }
+
+            switch (position[1]) {
+                // Y Coordinate Anchor
+                case 't':
+                    // Left
+                    y = 0;
+                    yFound = true;
                     break;
-                case 2:
-                    neighbors[sideValue] = target;
-                    neighbors[corValue] = array[coordinates.x][array[coordinates.x][coordinates.y-1] !== undefined ? coordinates.y-1 : (array[coordinates.x][coordinates.y+1] !== undefined ? coordinates.y+1 : '!!INVALID_POS')];
+                case 'm':
+                    // Middle
+                    y = Math.round((this.options.grid.length) / 2) - 1
+                    yFound = true;
+                    break;
+                case 'b':
+                    // Right
+                    y = this.options.grid.length-1
+                    yFound = true;
+                    break;
+                default:
+                    // The coordinate is a set number
+                    try {
+                        y = Number(position[1]);
+
+                        y = (y > 0) ? y : (this.options.grid.length-1)+y;
+                        yFound = true;
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
                     break;
             }
         }
-    
-        /*
-    
-        03567
-        . . . .
-        . . . .
-        X . . . .
-        X M . . .
-        X X X
-    
-        24567
-        . . . .
-        . . . .
-        . . . . X
-        . . . M X
-            X X X
-    
-        567
-        . . . .
-        . . . .
-        . . . .
-        . M . .
-        X X X
-    
-        */
-    
-        else if (neighbors[6] === undefined) {
-            // Bottom Row
-            for (let i = 5; i <= 7; i++) {
-                // Bottom [5,6,7] Only
-                switch (edge) {
-                    case 0:
-                        // Different
-                        neighbors[i] = '!!INVALID_POS';
-                        break;
-                    case 1:
-                        // Mirror
-                        neighbors[i] = target;
-                        break;
-                    case 2:
-                        // Copy
-                        if (i === 1) {
-                            // S of target
-                            neighbors[i] = target;
-                        }
-                        else {
-                            // SW, SE of target
-                            neighbors[i] = array[array[coordinates.x-1][coordinates.y] !== undefined ? coordinates.x-1 : (array[coordinates.x+1][coordinates.y] !== undefined ? coordinates.x+1 : '!!INVALID_POS')][coordinates.y];
-                        }
-                        break;
-                }
-            }
-            
-            if (neighbors[3] === undefined) {
-                // Left Corner
-                corValue = 5; // SW of target
-                sideValue = 3; // W of target
-                sideBotValue = 0; // NW of target
-            }
-            if (neighbors[4] === undefined) {
-                // Right Corner
-                corValue = 7; // SE of target
-                sideValue = 4; // E of target
-                sideBotValue = 2; // NE of target
-            }
-    
-            if (corValue !== null && sideValue !== null && sideBotValue !== null) {
-                // Check Bottom Corners if they match, otherwise ignore
-                if (edge === 1) {
-                    // Mirror: true
-                    neighbors[corValue] = target;
-                }
-                else {
-                    // Different, Copy: false
-                    neighbors[corValue] = '!!INVALID_POS';
-                }
-    
-                switch (edge) {
-                    case 0:
-                        // Different
-                        neighbors[sideValue] = '!!INVALID_POS';
-                        neighbors[sideBotValue] = '!!INVALID_POS';
-                        break;
-                    case 1:
-                        // Mirror
-                        neighbors[sideValue] = target;
-                        neighbors[sideBotValue] = target;
-                        break;
-                    case 2:
-                        // Copy
-                        neighbors[sideValue] = target;
-                        neighbors[sideBotValue] = array[coordinates.x+1][coordinates.y];
-                        break;
-                }
-            }
-        }
-    
-        console.log(neighbors);
-    
-        let binary = convertBinary(array[coordinates.x][coordinates.y], neighbors, edge);
-    
-        let condition = '0*0***11';
-    
-        console.log(binary, condition);
-        console.log('\n');
-    
-        if (evaluateCondition(binary, condition, edge)) {
-            console.log(`Condition ${condition} matched ${binary}`)
+
+        if (xFound && yFound) {
+            return {x: x, y: y, match: true}
         }
         else {
-            console.log('Condition rejected')
+            return {match: false}
+        }
+    }
+
+    async linkTiles(y, x, edge, replaceCode) {
+        // Check adjacent tile based on XY coordinate
+
+        // If the rule has a replaceCode, we assign it
+        let target = (replaceCode === undefined) ? this.options.grid[y][x] : replaceCode;
+
+        let binary = '';
+        let neighbors = '';
+
+        if (y === 0 && y === this.options.grid.length-1) {              // One Line
+            if (x === 0 && x === this.options.grid[0].length-1)         // One Column
+                neighbors = '%%%%%%%%';
+            else if (x === 0)                                           // Left
+                neighbors = '%%%% %%%';
+            else if (x === this.options.grid[0].length-1)               // Right
+                neighbors = '%%% %%%%';
+            else                                                        // Middle
+                neighbors = '%%%  %%%';                                 
+        }
+        else if (y == 0) {                                              // Top
+            if (x == 0 && x == this.options.grid[0].length - 1)         // One Column
+                neighbors = "%%%%%% %";
+            else if (x == 0)                                            // Left
+                neighbors = "%%%% %  ";
+            else if (x == this.options.grid[0].length - 1)              // Right
+                neighbors = "%%% %  %";
+            else                                                        // Middle
+                neighbors = "%%%     ";                   
+        }
+        else if (y == this.options.grid.length - 1) {                   // Bottom
+            if (x == 0 && x == this.options.grid[0].length - 1)         // One Column
+                neighbors = "% %%%%%%";
+            else if (x == 0)                                            // Left
+                neighbors = "%  % %%%";
+            else if (x == this.options.grid[0].length - 1)              // Right
+                neighbors = "  % %%%%";
+            else                                                        // Middle
+                neighbors = "     %%%";
+        }
+        else {                                                          // Middle
+            if (x == 0 && x == this.options.grid[0].length - 1)         // One Column
+                neighbors = "% %%%% %";
+            else if (x == 0)                                            // Left
+                neighbors = "%  % %  ";
+            else if (x == this.options.grid[0].length - 1)              // Right
+                neighbors = "  % %  %";
+            else                                                        // Middle
+                neighbors = "        ";
+        }
+
+        switch (edge) {
+            case 0:         // Different
+                for (let i = 0; i < neighbors.length; i++) {
+                    if (neighbors[i] === '%')
+                        binary += '0';
+                    else
+                        binary += await this.checkNeighborTiles(y, x, target, i);
+                }
+                break;
+            case 1:         // Copies
+                for (let i = 0; i < neighbors.length; i++) {
+                    if (neighbors[i] === '%')
+                        binary += '1';
+                    else
+                        binary += await this.checkNeighborTiles(y, x, target, i);
+                }
+                break;
+            case 2:         // Mirror
+                for (let i = 0; i < neighbors.length; i++) {
+                    if (neighbors[i] === '%')
+                        if (y % 2 === 1)
+                            binary += '1';
+                        else {
+                            if (await this.hasAdjacentTiles(x-1, y-1, target))
+                                binary += '1';
+                            else if (await this.hasAdjacentTiles(x-1, y+1, target))
+                                binary += '1';
+                            else if (await this.hasAdjacentTiles(x+1, y-1, target))
+                                binary += '1';
+                            else if (await this.hasAdjacentTiles(x+1, y+1, target))
+                                binary += '1';
+                            else
+                                binary += '0';
+                        }
+                    else
+                        binary += await this.checkNeighborTiles(y, x, target, i);
+                }
+                break;
+        }
+
+        return binary
+    }
+
+    async checkNeighborTiles(y, x, target, arrayPos) {
+        switch (arrayPos) {
+            case 0:
+                if (this.options.grid[y-1][x-1] === target)
+                    return '1'
+                else
+                    return '0'
+            case 1:
+                if (this.options.grid[y-1][x] === target)
+                    return '1'
+                else
+                    return '0'
+
+            case 2:
+                if (this.options.grid[y-1][x+1] === target)
+                    return '1'
+                else
+                    return '0'
+                
+            case 3:
+                if (this.options.grid[y][x-1] === target)
+                    return '1'
+                else
+                    return '0'
+                
+            case 4:
+                if (this.options.grid[y][x+1] === target)
+                    return '1'
+                else
+                    return '0'
+                
+            case 5:
+                if (this.options.grid[y+1][x-1] === target)
+                    return '1'
+                else
+                    return '0'
+                
+            case 6:
+                if (this.options.grid[y+1][x] === target)
+                    return '1'
+                else
+                    return '0'
+                
+            case 7:
+                if (this.options.grid[y+1][x+1] === target)
+                    return '1'
+                else
+                    return '0'
+
+            default:
+                return '0'
+                
+        }
+    }
+
+    async hasAdjacentTiles(y, x, target) {
+        if (y < 0) // Top edge
+        {
+            if (x < 0) // Left corner
+            {
+                if (this.options.grid[y+1][x+1] === target)
+                    return true;
+                else
+                    return false;
+            }
+            else if (x > this.options.grid[0].length - 1) // Right corner
+            {
+                if (this.options.grid[y+1][x-1] === target)
+                    return true;
+                else
+                    return false;
+            }
+            else // Middle
+            {
+                if (x != this.options.grid[0].length - 1)
+                    if (this.options.grid[y+1][x+1] === target)
+                        return true;
+                    else
+                        return false;
+                else if (x != 0)
+                    if (this.options.grid[y+1][x-1] === target)
+                        return true;
+                    else
+                        return false;
+                else
+                    return false;
+            }
+        }
+        else if (y > this.options.grid.length - 1) // Bottom edge
+        {
+            if (x < 0) // Left corner
+            {
+                if (this.options.grid[y-1][x+1] === target)
+                    return true;
+                else
+                    return false;
+            }
+            else if (x > this.options.grid[0].length - 1) // Right corner
+            {
+                if (this.options.grid[y-1][x-1] === target)
+                    return true;
+                else
+                    return false;
+            }
+            else // Middle
+            {   
+                console.log(y, this.options.grid.length)
+                console.log(x, this.options.grid[0].length)
+                if (x != this.options.grid[0].length - 1)
+                    if (this.options.grid[y-2][x+1] === target)
+                        return true;
+                    else
+                        return false;
+                else if (x != 0)
+                    if (this.options.grid[y-2][x-1] === target)
+                        return true;
+                    else
+                        return false;
+                else
+                    return false;
+            }
+        }
+        else // -
+        {
+            if (x < 0) // Left edge
+            {
+                if (y != 0)
+                    if (this.options.grid[y-1][x+1] === target)
+                        return true;
+                    else
+                        return false;
+                else if (y != this.options.grid.length - 1)
+                    if (this.options.grid[y+1][x+1] === target)
+                        return true;
+                    else
+                        return false;
+                else
+                    return false;
+            }
+            else if (x > this.options.grid[0].length - 1) // Right edge
+            {
+                if (y != 0)
+                    if (this.options.grid[y-1][x-1] === target)
+                        return true;
+                    else
+                        return false;
+                else if (y != this.options.grid.length - 1)
+                    if (this.options.grid[y+1][x-1] === target)
+                        return true;
+                    else
+                        return false;
+                else
+                    return false;
+            }
+            else // -
+            {
+                return false;
+            }
         }
     }
 }
@@ -925,6 +1562,7 @@ Initializing...
         await this.readPreset();
         await this.readTiles();
         await this.readLinkRules();
+        await this.readGamemodes();
         await this.readDefaultEnvironment();
         await this.readEnvironments();
 
@@ -936,6 +1574,95 @@ Initializing...
         let options = {
             name: 'Breakpoint',
             grid: [
+                // "WWW...............",
+                // "......W.WW..WWW...",
+                // ".WWW.WW.WWW.WWW...",
+                // ".WWW..WWWW.WWWW...",
+                // ".WWWW...W..WW.....",
+                // "...WW..WW.....W...",
+                // "..W...WWWWW..WWW..",
+                // ".WWW..W...WW.W....",
+                // ".WWWWWW.W.WWWWWW..",
+                // "...W.WW...W..WWW..",
+                // ".WWW..WWWWW...W...",
+                // "..W.W...WW........",
+                // "...WWW..W.....WW..",
+                // "....W..WWWW..WWWW.",
+                // "......WWW.WW.WWWW.",
+                // ".......WW.W...WW..",
+                // "..................",
+                // 'JJJJJJJ.2.2.2.JJJJJJJ',
+                // 'JJJJJJJ.......JJJJJJJ',
+                // 'JJJJJJJ...,...JJJJJJJ',
+                // 'JJJJJJJ.......JJJJJJJ',
+                // 'M..RRR............YYY',
+                // '...FFFFF.............',
+                // '...FFWWWW............',
+                // '...FFWWWW............',
+                // '...FFWWWWYYY.........',
+                // '...FFFFFFFFFF........',
+                // '...FFFFFFF...........',
+                // '..............TT.....',
+                // 'YYY....M.............',
+                // 'MM.....M.............',
+                // 'MM....MM.....FFF.....',
+                // 'M.....MM.....FFFFF...',
+                // 'M....III.....III....M',
+                // '...FFFFF.....MM.....M',
+                // '.....FFF.....MM....MM',
+                // '.............M.....MM',
+                // '.............M....YYY',
+                // '.....TT..............',
+                // '...........FFFFFFF...',
+                // '........FFFFFFFFFF...',
+                // '.........YYYWWWWFF...',
+                // '............WWWWFF...',
+                // '............WWWWFF...',
+                // '.............FFFFF...',
+                // 'YYY............FFF..M',
+                // 'JJJJJJJ.......JJJJJJJ',
+                // 'JJJJJJJ...,...JJJJJJJ',
+                // 'JJJJJJJ.......JJJJJJJ',
+                // 'JJJJJJJ.1.1.1.JJJJJJJ'
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '.............8.............',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '.......b...................',
+                // '.......b...................',
+                // '.......b...................',
+                // '.......b...................',
+                // '.......b...................',
+                // '.......b...................',
+                // '.......b...................',
+                // '.......b...................',
+                // '.......b...................',
+                // '.......b...................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '...........................',
+                // '.............8.............',
+                // '...........................',
+                // '...........................',
+                // '...........................'
                 'MMM.....2.2.2..FFFFFM',
                 'MM...............FFFM',
                 'MM.................MM',
@@ -957,7 +1684,7 @@ Initializing...
                 '.....FFF.....MM....MM',
                 '.............M.....MM',
                 '.............M....YYY',
-                '.....................',
+                '.....TT..............',
                 '...........FFFFFFF...',
                 '........FFFFFFFFFF...',
                 '.........YYYWWWWFF...',
@@ -970,22 +1697,45 @@ Initializing...
                 'MFFF...............MM',
                 'MFFFFF..1.1.1.....MMM',
             ],
-            environment: 'Canyon',
+            environment: 'Grassfield',
+            gamemode: 'Brawl Ball',
             skipTiles: [ 'J' ],
             replaceTiles: [
                 {
                     from: 'R',
                     to: 'F'
                 },
-                {
-                    from: 'W',
-                    to: '.'
-                }
+                // {
+                //     from: 'W',
+                //     to: 'M'
+                // },
+                // {
+                //     from: 'N',
+                //     to: 'X'
+                // }
             ],
+            // assetSwitcher: [
+            //     {
+            //         find: {
+            //             tile: 'water',
+            //             variant: 'water'
+            //         },
+            //         replace: {
+            //             tile: 'blocking2',
+            //             variant: 'crystalMagenta'
+            //         }
+            //     }
+            // ],
+            // replaceEnvironment: [
+            //     {
+            //         tile: 'blocking2',
+            //         environment: 'Jungle'
+            //     }
+            // ],
             border: 1
         }
 
-        const map = await new Map(options, this.environments[options.environment], this.sizeMultiplier, this.ignoreTiles, this.tiles, options.border).initialize();
+        await new Map(options, this.sizeMultiplier, this.ignoreTiles, this.tiles, this.linkRules, this.gamemodes, this.defaultEnvironment, this.environments).initialize();
     }
 
     // async readOptions() {
@@ -1055,6 +1805,17 @@ Initializing...
         console.log(`Successfully loaded ${i} linkRules\n`);
     }
 
+    async readGamemodes() {
+        // Create Gamemode object from preset
+        console.log('Loading gamemodes...');
+
+        for (const gamemode of this.presetData.gamemodes) {
+            this.gamemodes[gamemode.name] = await new Gamemode(gamemode).initialize();
+        }
+
+        console.log(`Successfully loaded gamemodes\n`);
+    }
+
     async readDefaultEnvironment() {
         // Create DefaultEnvironment object from preset
         console.log('Loading defaultEnvironment...');
@@ -1073,10 +1834,6 @@ Initializing...
         }
 
         console.log(`Successfully loaded environments\n`);
-    }
-
-    async readGamemodes() {
-        // Create Gamemode objects from preset
     }
 }
 

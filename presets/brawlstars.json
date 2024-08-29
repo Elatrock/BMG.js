@@ -23,6 +23,24 @@
                     },
                     "order": 0,
                     "orderHor": 0
+                },
+                "stoneBlock": {
+                    "asset": "stone_block.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "iceBlock": {
+                    "asset": "ice_block.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
                 }
             }
         },
@@ -40,6 +58,27 @@
                     },
                     "order": 0,
                     "orderHor": 0
+                },
+                "grassBlock": {
+                    "asset": "grass_block.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    }
+                },
+                "crystalMagenta": {
+                    "asset": "crystal_magenta.svg",
+                    "offset": {
+                        "top": 405,
+                        "left": 0
+                    }
+                },
+                "crystalRed": {
+                    "asset": "crystal_red.svg",
+                    "offset": {
+                        "top": 405,
+                        "left": 0
+                    }
                 }
             }
         },
@@ -51,6 +90,15 @@
             "variants": {
                 "crate": {
                     "asset": "crate.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "presentBox": {
+                    "asset": "present_box.svg",
                     "offset": {
                         "top": 500,
                         "left": 0
@@ -74,6 +122,15 @@
                     },
                     "order": 0,
                     "orderHor": 0
+                },
+                "presentBarrel": {
+                    "asset": "present_barrel.svg",
+                    "offset": {
+                        "top": 528,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
                 }
             }
         },
@@ -85,6 +142,33 @@
             "variants": {
                 "grassYellow": {
                     "asset": "grass_yellow.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "grassGreen": {
+                    "asset": "grass_green.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "grassCyan": {
+                    "asset": "grass_cyan.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "grassBlue": {
+                    "asset": "grass_blue.svg",
                     "offset": {
                         "top": 500,
                         "left": 0
@@ -108,6 +192,24 @@
                     },
                     "order": 0,
                     "orderHor": 1
+                },
+                "mushroom": {
+                    "asset": "mushroom.svg",
+                    "offset": {
+                        "top": 464,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 1
+                },
+                "tree": {
+                    "asset": "tree.svg",
+                    "offset": {
+                        "top": 464,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
                 }
             }
         },
@@ -125,6 +227,24 @@
                     },
                     "order": 0,
                     "orderHor": 0
+                },
+                "vase": {
+                    "asset": "vase.svg",
+                    "offset": {
+                        "top": 392,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "presentMini": {
+                    "asset": "present_mini.svg",
+                    "offset": {
+                        "top": 303,
+                        "left": 0
+                    },
+                    "order": 0,
+                    "orderHor": 0
                 }
             }
         },
@@ -139,7 +259,7 @@
                         "hor": {
                             "asset": "fence_hor.svg",
                             "offset": {
-                                "top": 601,
+                                "top": 120,
                                 "left": 45
                             },
                             "order": 0,
@@ -243,7 +363,7 @@
             "type": "MODE",
             "variants": {
                 "playerRed": {
-                    "asset": "player_blue.svg",
+                    "asset": "player_red.svg",
                     "offset": {
                         "top": 350,
                         "left": 350
@@ -266,6 +386,69 @@
                         "left": 440
                     },
                     "order": 5,
+                    "orderHor": 0
+                },
+                "mineSnow": {
+                    "asset": "mine_snow.svg",
+                    "offset": {
+                        "top": 500,
+                        "left": 545
+                    },
+                    "order": 5,
+                    "orderHor": 0
+                },
+                "brawlBall": {
+                    "asset": "brawlball.svg",
+                    "offset": {
+                        "top": 349,
+                        "left": 162
+                    },
+                    "order": 2,
+                    "orderHor": 0
+                },
+                "goalRed": {
+                    "asset": "goal_red.svg",
+                    "offset": {
+                        "top": 2851,
+                        "left": 2829
+                    },
+                    "order": 2,
+                    "orderHor": 0
+                },
+                "goalBlue": {
+                    "asset": "goal_blue.svg",
+                    "offset": {
+                        "top": 2534,
+                        "left": 2829
+                    },
+                    "order": 2,
+                    "orderHor": 0
+                },
+                "star": {
+                    "asset": "bounty_star.svg",
+                    "offset": {
+                        "top": 866,
+                        "left": 97
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "ikeRed": {
+                    "asset": "ike_red.svg",
+                    "offset": {
+                        "top": 2021,
+                        "left": 411
+                    },
+                    "order": 0,
+                    "orderHor": 0
+                },
+                "ikeBlue": {
+                    "asset": "ike_blue.svg",
+                    "offset": {
+                        "top": 2235,
+                        "left": 873
+                    },
+                    "order": 0,
                     "orderHor": 0
                 },
                 "payloadCart": {
@@ -499,7 +682,7 @@
                     "orderHor": 0
                 },
                 "ikeRangeRed": {
-                    "asset": "ike_blue_range.svg",
+                    "asset": "ike_red_range.svg",
                     "offset": {
                         "top": 525,
                         "left": 11650
@@ -1212,6 +1395,7 @@
     ],
     "linkRules": {
         "simpleFences": {
+            "name": "simpleFences",
             "rules": [
                 {
                     "condition": "*1****0*",
@@ -1227,6 +1411,10 @@
                 },
                 {
                     "condition": "***10***",
+                    "linkTile": "cor"
+                },
+                {
+                    "condition": "*1*11*1*",
                     "linkTile": "cor"
                 },
                 {
@@ -1241,25 +1429,26 @@
             "edge": 1
         },
         "benches": {
+            "name": "benches",
             "rules": [
                 {
                     "condition": "***01***",
-                    "requiredTags": "benchOne",
+                    "requiredTag": "benchOne",
                     "linkTile": "tr"
                 },
                 {
                     "condition": "***10***",
-                    "requiredTags": "benchOne",
+                    "requiredTag": "benchOne",
                     "linkTile": "tl"
                 },
                 {
                     "condition": "*0****1*",
-                    "requiredTags": "benchOne",
+                    "requiredTag": "benchOne",
                     "linkTile": "lt"
                 },
                 {
                     "condition": "*1****0*",
-                    "requiredTags": "benchOne",
+                    "requiredTag": "benchOne",
                     "linkTile": "lb"
                 },
                 {
@@ -1286,6 +1475,7 @@
             "edge": 0
         },
         "ropeFences": {
+            "name": "ropeFences",
             "rules": [
                 {
                     "condition": "*1**1***",
@@ -1307,56 +1497,57 @@
             "edge": 0
         },
         "payloadCart": {
+            "name": "payloadCart",
             "rules": [
                 {
 					"condition": "******1*",
-					"overrideCode": "b",
+					"replaceCode": "b",
 					"requiredGamemode": "Payload",
 					"requiredTag": "redTrack",
 					"linkTile": "c2side"
 				},
 				{
 					"condition": "*1******",
-					"overrideCode": "b",
+					"replaceCode": "b",
 					"requiredGamemode": "Payload",
 					"requiredTag": "redTrack",
 					"linkTile": "c1side"
 				},
 				{
 					"condition": "****1***",
-					"overrideCode": "b",
+					"replaceCode": "b",
 					"requiredGamemode": "Payload",
 					"requiredTag": "redTrack",
 					"linkTile": "c2"
 				},
 				{
 					"condition": "***1****",
-					"overrideCode": "b",
+					"replaceCode": "b",
 					"requiredGamemode": "Payload",
 					"requiredTag": "redTrack",
 					"linkTile": "c1"
 				},
 				{
 					"condition": "******1*",
-					"overrideCode": "b",
+					"replaceCode": "b",
 					"requiredGamemode": "Payload",
 					"linkTile": "c2side"
 				},
 				{
 					"condition": "*1******",
-					"overrideCode": "b",
+					"replaceCode": "b",
 					"requiredGamemode": "Payload",
 					"linkTile": "c1side"
 				},
 				{
 					"condition": "****1***",
-					"overrideCode": "b",
+					"replaceCode": "b",
 					"requiredGamemode": "Payload",
 					"linkTile": "c2"
 				},
 				{
 					"condition": "***1****",
-					"overrideCode": "b",
+					"replaceCode": "b",
 					"requiredGamemode": "Payload",
 					"linkTile": "c1"
 				}
@@ -1368,6 +1559,7 @@
             "edge": 0
         },
         "payloadTrack": {
+            "name": "payloadTrack",
             "rules": [
                 {
 					"condition": "*1**1***",
@@ -1487,11 +1679,31 @@
             "edge": 0
         },
         "water": {
+            "name": "water",
             "rules": [
-
+                {
+                    "condition": "*0******",
+                    "changeBinary": [ "0a0", "0a2" ],
+                    "linkTile": "c"
+                },
+                {
+                    "condition": "***0****",
+                    "changeBinary": [ "0a0", "0a5" ],
+                    "linkTile": "c"
+                },
+                {
+                    "condition": "****0***",
+                    "changeBinary": [ "0a2", "0a7" ],
+                    "linkTile": "c"
+                },
+                {
+                    "condition": "******0*",
+                    "changeBinary": [ "0a5", "0a7" ],
+                    "linkTile": "c"
+                }
             ],
             "defaults": {
-                "linkTile": ""
+                "linkTile": "c"
             },
             "multipleConditions": true,
             "edge": 0
@@ -1508,7 +1720,10 @@
             ],
             "defaults": {
                 "tiles": {
-                    "objective": "mine"
+                    "objective": {
+                        "default": "mine",
+                        "Snowy": "mineSnow"
+                    }
                 }
             }
         },
@@ -1522,14 +1737,22 @@
             ],
             "defaults": {
                 "tiles": {
-                    "objective": "brawlBall"
+                    "objective": {
+                        "default": "brawlBall",
+                        "Stadium": "stadiumBall",
+                        "Stuntshow": "stuntshowBall"
+                    }
                 },
                 "positionTiles": {
                     "team1": {
                         "drawOver": [
                             {
                                 "tile": "objective",
-                                "type": "goalBlue",
+                                "variant": {
+                                    "default": "goalBlue",
+                                    "Stadium": "goalBlueStadium",
+                                    "Stuntshow": "goalBlueStuntshow"
+                                },
                                 "position": "m,-2",
                                 "drawOrder": 2
                             }
@@ -1539,15 +1762,19 @@
                         "drawOver": [
                             {
                                 "tile": "objective",
-                                "type": "goalRed",
+                                "variant": {
+                                    "default": "goalRed",
+                                    "Stadium": "goalRedStadium",
+                                    "Stuntshow": "goalRedStuntshow"
+                                },
                                 "position": "m,2",
                                 "drawOrder": 2
                             }
                         ]
-                    }
-                },
-                "positionDivide": "hor",
-                "invert": false
+                    },
+                    "positionDivide": "hor",
+                    "invert": false
+                }
             }
         },
         {
@@ -1585,15 +1812,14 @@
             "name": "Siege",
             "defaults": {
                 "tiles": {
-                    "objective": "ikeBlue",
                     "gameMapItem": "bolts"
                 },
                 "positionTiles": {
                     "team1": {
                         "drawOver": [
                             {
-                                "tile": "objective",
-                                "type": "ikeRangeBlue",
+                                "tile": "ikeRange",
+                                "variant": "ikeRangeBlue",
                                 "position": "m,-1",
                                 "drawOrder": 1
                             }
@@ -1605,8 +1831,8 @@
                     "team2": {
                         "drawOver": [
                             {
-                                "tile": "objective",
-                                "type": "ikeRangeRed",
+                                "tile": "ikeRange",
+                                "variant": "ikeRangeRed",
                                 "position": "m,1",
                                 "drawOrder": 1
                             }
@@ -1614,10 +1840,10 @@
                         "tiles": {
                             "objective": "ikeRed"
                         }
-                    }
-                },
-                "positionDivide": "hor",
-                "invert": false
+                    },
+                    "positionDivide": "hor",
+                    "invert": false
+                }
             }
         },
         {
@@ -1636,10 +1862,10 @@
                         "tiles": {
                             "objective": "presentRed"
                         }
-                    }
-                },
-                "positionDivide": "hor",
-                "invert": false
+                    },
+                    "positionDivide": "hor",
+                    "invert": false
+                }
             }
         },
         {
@@ -1681,7 +1907,7 @@
             "drawOver": [
                 {
                     "tile": "objective",
-                    "type": "star",
+                    "variant": "star",
                     "position": "m,m",
                     "drawOrder": 2
                 }
@@ -1697,7 +1923,7 @@
             "drawOver": [
                 {
                     "tile": "player2",
-                    "type": "playerBoss",
+                    "variant": "playerBoss",
                     "position": "m,m",
                     "drawOrder": 2
                 }
@@ -1722,7 +1948,7 @@
             "drawOver": [
                 {
                     "tile": "objective",
-                    "type": "trophy",
+                    "variant": "trophy",
                     "position": "m,m",
                     "drawOrder": 2
                 }
@@ -1738,7 +1964,7 @@
             "drawOver": [
                 {
                     "tile": "objective",
-                    "type": "volleyBall",
+                    "variant": "volleyBall",
                     "position": "m,m",
                     "drawOrder": 2
                 }
@@ -1754,7 +1980,7 @@
             "drawOver": [
                 {
                     "tile": "objective",
-                    "type": "basketBall",
+                    "variant": "basketBall",
                     "position": "m,m",
                     "drawOrder": 2
                 }
@@ -1768,13 +1994,13 @@
                         "drawOver": [
                             {
                                 "tile": "objective",
-                                "type": "basketRangeBlue",
+                                "variant": "basketRangeBlue",
                                 "position": "r,m",
                                 "drawOrder": 1
                             },
                             {
                                 "tile": "objective",
-                                "type": "basketBlue",
+                                "variant": "basketBlue",
                                 "position": "r,m",
                                 "drawOrder": 2
                             }
@@ -1784,21 +2010,21 @@
                         "drawOver": [
                             {
                                 "tile": "objective",
-                                "type": "basketRangeRed",
+                                "variant": "basketRangeRed",
                                 "position": "l,m",
                                 "drawOrder": 1
                             },
                             {
                                 "tile": "objective",
-                                "type": "basketRed",
+                                "variant": "basketRed",
                                 "position": "l,m",
                                 "drawOrder": 2
                             }
                         ]
-                    }
-                },
-                "positionDivide": "ver",
-                "invert": false
+                    },
+                    "positionDivide": "ver",
+                    "invert": false
+                }
             }
         },
         {
@@ -1905,6 +2131,76 @@
                     "r": 249,
                     "g": 166,
                     "b": 117
+                }
+            }
+        },
+        {
+            "name": "Jungle",
+            "background": {
+                "color1": {
+                    "r": 234,
+                    "g": 180,
+                    "b": 119
+                }
+            },
+            "defaults": {
+                "tiles": {
+                    "blocking2": "grassBlock",
+                    "forest": "grassGreen"
+                }
+            }
+        },
+        {
+            "name": "Mine",
+            "background": {
+                "color1": {
+                    "r": 96,
+                    "g": 68,
+                    "b": 84
+                }
+            },
+            "defaults": {
+                "tiles": {
+                    "blocking1": "stoneBlock",
+                    "blocking2": "crystalMagenta",
+                    "forest": "grassCyan",
+                    "respawningWall": "mushroom"
+                }
+            }
+        },
+        {
+            "name": "Grassfield",
+            "background": {
+                "color1": {
+                    "r": 60,
+                    "g": 150,
+                    "b": 87
+                }
+            },
+            "defaults": {
+                "tiles": {
+                    "forest": "grassGreen"
+                }
+            }
+        },
+        {
+            "name": "Snowy",
+            "background": {
+                "color1": {
+                    "r": 47,
+                    "g": 162,
+                    "b": 255
+                }
+            },
+            "defaults": {
+                "tiles": {
+                    "blocking1": "iceBlock",
+                    "blocking2": "crystalRed",
+                    "blocking3": "presentBox",
+                    "blocking4": "presentBarrel",
+                    "forest": "grassBlue",
+                    "respawningWall": "tree",
+                    "blockingDestroyableWithWeapon": "presentMini"
                 }
             }
         }
